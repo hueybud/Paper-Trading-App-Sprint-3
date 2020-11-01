@@ -26,7 +26,7 @@ function getPortfolioTickers(portfolioID) {
         Portfolio.find({portfolioID: portfolioID}, function(err, result) {
             var tickerList = [];
             console.log(result[0]);
-            for (elem in result[0].stocks) {
+            for (var elem in result[0].stocks) {
                 tickerList.push(result[0].stocks[elem].ticker);
             }
             resolve(tickerList);
