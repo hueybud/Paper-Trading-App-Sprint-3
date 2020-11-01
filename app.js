@@ -12,6 +12,8 @@ const saltRounds = 10;
 var portfolioModel = require('./models/PortfolioModel');
 var userModel = require('./models/UserModel');
 var stockAPIs = require('./stockAPIs/api');
+var loginHelpers = require('./helpers/loginHelpers');
+var portfolioHelpers = require('./helpers/portfolioHelpers');
 
 app.set('view engine', 'ejs');
 app.use('/assets', express.static(__dirname + '/assets'));
@@ -65,112 +67,30 @@ app.get('/dashboard', async function(req, res){
   let portfolioTickers = await portfolioModel.getPortfolioTickers(req.session.theUser.portfolioID);
   let apiQuotes = await stockAPIs.getPortfolioQuotes(portfolioTickers);
   console.log(portfolioObj);
-/*   let netValue = +portfolioObj.principal + +portfolioObj.gain;
-  let allDayGain = 0;
-  for (var i = 0; i < portfolioObj.stocks.length; i++) {
-    // go through each stock and get it's day gain and add that to the net value
-    var dayGain = (portfolioObj.stocks[i].purchaseValue*apiQuotes[Object.keys(apiQuotes)[i]].quote.changePercent).toFixed(2);
-    portfolioObj.stocks[i]['dayGain'] = dayGain;
-    allDayGain += parseFloat(dayGain);
-  }
-  netValue += parseFloat(allDayGain); */
-  var dashboardComponents = calculatePortfolio(portfolioObj, apiQuotes);
+  var dashboardComponents = await portfolioHelpers.calculatePortfolio(portfolioObj, apiQuotes);
   console.log('render');
-  //console.log(netValue.toFixed(2));
   res.render('dashboard', {userFirstName: req.session.theUser.userFirstName, portfolioObj: dashboardComponents.portfolioObj, apiQuotes: dashboardComponents.apiQuotes, netValue: dashboardComponents.netValue, allDayGain: dashboardComponents.allDayGain, cash: dashboardComponents.portfolioObj.cash});
 })
-
-function calculatePortfolio(portfolioObj, apiQuotes) {
-  let netValue = +portfolioObj.principal + +portfolioObj.gain;
-  let allDayGain = 0;
-  for (var i = 0; i < portfolioObj.stocks.length; i++) {
-    // go through each stock and get it's day gain and add that to the net value
-    var dayGain = (portfolioObj.stocks[i].purchaseValue*apiQuotes[Object.keys(apiQuotes)[i]].quote.changePercent).toFixed(2);
-    portfolioObj.stocks[i]['dayGain'] = dayGain;
-    allDayGain += parseFloat(dayGain);
-  }
-  netValue += parseFloat(allDayGain);
-  return {portfolioObj: portfolioObj, apiQuotes: apiQuotes, netValue: netValue, allDayGain: allDayGain};
-}
 
 // SIGN IN AND REGISTER PATHS
 
 
 async function signIn(req) {
   return new Promise(async function(resolve, reject){
-    var errors = [];
-    if (!req.body.userName.trim().match(/^(?=.*[0-9])(?=.*[A-Z])([a-zA-Z0-9]+)$/)) {
-      errors.push("Username does not contain 1 uppercase letter and 1 number");
-    }
-    if (req.body.password.trim().length < 8) {
-      errors.push("Password must be at least 8 characters long");
-    }
-    if (errors.length != 0) {
-      resolve(errors[0]);
+    var signInResult = await loginHelpers.checkSignin(req);
+    if (signInResult[0] == "logged in") {
+      req.session.theUser = signInResult[1];
+      resolve(signInResult[0])
     } else {
-      let userAccount = await userModel.getUserByUsername(req.body.userName);
-      if (userAccount == undefined) {
-        resolve("User does not exist");
-      } else {
-        var compareResult = false;
-        console.log("on file password");
-        console.log(userAccount.password);
-        compareResult = bcrypt.compareSync("12345678", userAccount.password);
-        if (compareResult) {
-          req.session.theUser = userAccount;
-          console.log("user did exist. was assigned the session name:" + req.session.theUser.userName);
-          resolve("logged in");
-        } else {
-          console.log("user existed but password didn't match");
-          resolve("Incorrect Password");
-        }
-      }
+      resolve("Incorrect Password");
     }
   })
 }
 
-function createUser(req) {
-  var insertObj = { "firstName": req.body.firstName, "lastName": req.body.lastName, "email": req.body.email, "createdOn": new Date().toLocaleDateString(), "admin": (req.body.admin == "true") || false, "role": req.body.role || "R", "videoProgress": [], "quizProgress": [] };
-  return insertObj;
-}
-
 function register(req) {
   return new Promise(async function(resolve, reject){
-    var errors = [];
-    if(!req.body.userFirstName.trim().match(/^[A-Z]+$/i)) {
-      errors.push("First name is not valid");
-    }
-    if(!req.body.userLastName.trim().match(/^[A-Z]+$/i)) {
-      errors.push("Last name is not valid");
-    }
-    if(await userModel.getUserByUsername(req.body.userName) != undefined) {
-      errors.push("User already exists")
-    }
-    if (!req.body.userName.trim().match(/^(?=.*[0-9])(?=.*[A-Z])([a-zA-Z0-9]+)$/)) {
-      errors.push("Username does not contain 1 uppercase letter and 1 number");
-    }
-    if (req.body.password.trim().length < 8 || req.body.confirmPassword.trim().length < 8) {
-      errors.push("Passwords must be at least 8 characters long");
-    }
-    if (req.body.password != req.body.confirmPassword) {
-      errors.push("Passwords must match");
-    }
-    console.log(errors);
-    if (errors.length != 0) {
-      resolve(errors[0]);
-    } else {
-      console.dir(req.body);
-      var createUserObj = userModel.user(req.body);
-      createUserObj.userID = await userModel.getNewUserID();
-      createUserObj.portfolioID = createUserObj.userID;
-      createUserObj.password = bcrypt.hashSync(createUserObj.password, saltRounds)
-      console.log("created user");
-      console.log(createUserObj);
-      await userModel.addUser(createUserObj);
-      await portfolioModel.addPortfolio(createUserObj.userID);
-      req.session.theUser = await userModel.getUserByUsername(req.body.userName);
-      resolve("user added");
-    }
+    var registerResult = await loginHelpers.checkRegister(req);
+    resolve(registerResult);
   })
 }
 
