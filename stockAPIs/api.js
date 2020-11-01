@@ -9,9 +9,9 @@ function getPortfolioQuotes(portfolioTickers) {
     })
 }
 
-function getIndexes() {
+function getIndexes(dateRange) {
     return new Promise(async function(resolve ,reject){
-        var apiResponse = await fetch('https://cloud.iexapis.com/stable/stock/market/batch?symbols=dia,qqq,spy&types=chart,quote&range=5d&token=pk_182dfc5d61b24ef0bab43ff45b5903e9');
+        var apiResponse = await fetch('https://cloud.iexapis.com/stable/stock/market/batch?symbols=dia,qqq,spy&types=chart,quote&range=' + dateRange + '&token=pk_182dfc5d61b24ef0bab43ff45b5903e9');
         apiResponse = await apiResponse.json();
         resolve(apiResponse);
     })
