@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%-include('headTags')-%>
+    <style>
+      footer {
+        font-size: 10pt;
+        text-align: center;
+        background-color: #2B6499;
+        color: white;
+      }
+      html, body{
+          height: 100%;
+      }
+    </style>
+    <title>APA Web</title>
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <% if (typeof userFirstName === "undefined"){ %>
+      <%-include('nav')-%>
+    <% } else{ %>
+      <%-include('navSignIn')-%>
+    <% } %>
+    <h2 class="pl-2 pt-2 text-danger">Database Connection Error</h2>
+    <%-include ('footer')-%>
+  </body>
+</html>

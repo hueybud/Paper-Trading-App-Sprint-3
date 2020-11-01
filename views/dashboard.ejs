@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%-include('headTags')-%>
+    <style>
+      footer {
+        font-size: 10pt;
+        text-align: center;
+        background-color: #2B6499;
+        color: white;
+      }
+      html, body{
+          height: 100%;
+      }
+      .buttons-flex {
+        display: flex;
+        justify-content: center;
+        }
+    </style>
+    <script>
+        $(document).ready(function(){
+            // call our api friend
+            // use an if statement for the labels (day, week, month, etc)
+
+            var labels = [];
+            var data = [];
+            function formatIndexResults(result) {
+                console.log(result);
+                for (var i = 0; i < Object.keys(result).length; i++) {
+                    var innerData = [];
+                    for (var j = 0; j < result[Object.keys(result)[i]]['chart'].length; j++) {
+                        innerData.push(result[Object.keys(result)[i]]['chart'][j]['changePercent'])
+                    }
+                    data.push(innerData);
+                }
+                for (var j = 0; j < result[Object.keys(result)[0]]['chart'].length; j++) {
+                    labels.push(result[Object.keys(result)[0]]['chart'][j]['date'].split("-")[2])
+                }
+                console.log(labels)
+                createChart();
+            }
+
+            $.ajax({
+                url: '/getIndexes',
+                method: 'GET',
+                success: function(result) {
+                    formatIndexResults(result);
+                }
+            })
+            function createChart() {
+                var ctx = document.getElementById('myChart');
+                var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{ 
+                        data: data[0],
+                        label: "DOW",
+                        borderColor: "#3e95cd",
+                        fill: false
+                    }, { 
+                        data: data[1],
+                        label: "NASDAQ",
+                        borderColor: "#8e5ea2",
+                        fill: false
+                    }, { 
+                        data: data[2],
+                        label: "S&P 500",
+                        borderColor: "#3cba9f",
+                        fill: false
+                    }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Major Indexes'
+                    },
+                    scales: {
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Percent Change"
+                            }
+                        }]
+                    }
+                }
+                });
+            }
+        })
+    </script>
+    <title>APA Web</title>
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <% if (typeof userFirstName === "undefined"){ %>
+      <%-include('nav')-%>
+    <% } else{ %>
+      <%-include('navSignIn')-%>
+    <% } %>
+    <div class="container-fluid">
+        <div class="row pt-3">
+            <div class="col-lg-6">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h3 class="pt-2 pl-2">Account Summary</h3>
+                        <div class="table-responsive">
+                            <table class="table">
+                                  <tr>
+                                      <th>Net Account Value</th>
+                                      <td>$<%=parseFloat(netValue).toLocaleString('en-US', {minimumFractionDigits:2})%></td>
+                                  </tr>
+                                  <tr>
+                                      <th>Day's Gain</th>
+                                      <% if (allDayGain < 0) {%>
+                                          <td class="text-danger">$<%=parseFloat(allDayGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((allDayGain/netValue) * 100).toFixed(2)%>%)</td>
+                                      <%} else {%>
+                                          <td class="text-success">$<%=parseFloat(allDayGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((allDayGain/netValue) * 100).toFixed(2)%>%)</td>
+                                      <%}%>
+                                  </tr>   
+                                  <tr>
+                                      <th>Cash Purchasing Power</th>
+                                      <td>$<%=parseFloat(cash).toLocaleString('en-US', {minimumFractionDigits:2})%></td>
+                                  </tr>                   
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg">
+                          <h3 class="pl-2">Open Positions</h3>
+                          <% if (!portfolioObj.stocks.length) {%>
+                            <h5 class="pl-2">No open positions in this portfolio</h5>
+                          <%} else {%>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tr>
+                                        <th>Ticker</th>
+                                        <th>Change %</th>
+                                        <th>Last Price</th>
+                                        <th>Change $</th>
+                                        <th>Day's Gain</th>
+                                    </tr>
+                                    <% for (var i = 0; i < portfolioObj.stocks.length; i++) {%>
+                                        <tr>
+                                            <td><a href="/stock/<%=Object.keys(apiQuotes)[i]%>"><%=Object.keys(apiQuotes)[i]%></a></td>
+                                            <% if (apiQuotes[Object.keys(apiQuotes)[i]].quote.changePercent < 0) {%>
+                                                <td class="text-danger"><%=(apiQuotes[Object.keys(apiQuotes)[i]].quote.changePercent * 100).toFixed(2)%>%</td>
+                                                <td>$<%=apiQuotes[Object.keys(apiQuotes)[i]].quote.latestPrice%></td>
+                                                <td class="text-danger">-$<%=Math.abs(apiQuotes[Object.keys(apiQuotes)[i]].quote.change)%></td>    
+                                                <td class="text-danger">-$<%=Math.abs(portfolioObj.stocks[i].dayGain)%></td>    
+                                            <%} else {%>
+                                                <td class="text-success"><%=(apiQuotes[Object.keys(apiQuotes)[i]].quote.changePercent * 100).toFixed(2)%>%</td>
+                                                <td>$<%=apiQuotes[Object.keys(apiQuotes)[i]].quote.latestPrice%></td>
+                                                <td class="text-danger">$<%=apiQuotes[Object.keys(apiQuotes)[i]].quote.change%></td>    
+                                                <td class="text-success">$<%=portfolioObj.stocks[i].dayGain%></td>    
+                                            <%}%>                  
+                                        </tr>
+                                    <%}%>
+                                
+                                </table>
+                            </div>
+                          <%}%>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <h3 class="pt-2 pl-2">Index Performance</h3>
+                <canvas id="myChart"></canvas>
+                <div class="buttons-flex pb-2">
+                    <button type="button" class="btn btn-secondary btn-sm mr-1">1D</button>
+                    <button type="button" class="btn btn-secondary btn-sm mr-1">1W</button>
+                    <button type="button" class="btn btn-secondary btn-sm mr-1">1M</button>
+                    <button type="button" class="btn btn-secondary btn-sm mr-1">3M</button>
+                    <button type="button" class="btn btn-secondary btn-sm mr-1">6M</button>
+                    <button type="button" class="btn btn-secondary btn-sm mr-1">1Y</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%-include ('footer')-%>
+  </body>
+</html>
