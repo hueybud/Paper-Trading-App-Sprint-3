@@ -64,13 +64,17 @@ app.get('/dbConnectionError', function (req, res) {
 })
 
 app.get('/dashboard', async function(req, res){
-  let portfolioObj = await portfolioModel.getPortfolio(req.session.theUser.portfolioID);
-  let portfolioTickers = await portfolioModel.getPortfolioTickers(req.session.theUser.portfolioID);
-  let apiQuotes = await stockAPIs.getPortfolioQuotes(portfolioTickers);
-  console.log(portfolioObj);
-  var dashboardComponents = await portfolioHelpers.calculatePortfolio(portfolioObj, apiQuotes);
-  console.log('render');
-  res.render('dashboard', {userFirstName: req.session.theUser.userFirstName, portfolioObj: dashboardComponents.portfolioObj, apiQuotes: dashboardComponents.apiQuotes, netValue: dashboardComponents.netValue, allDayGain: dashboardComponents.allDayGain, cash: dashboardComponents.portfolioObj.cash});
+  if (!req.session.theUser) {
+    res.redirect('signin');
+  } else {
+    let portfolioObj = await portfolioModel.getPortfolio(req.session.theUser.portfolioID);
+    let portfolioTickers = await portfolioModel.getPortfolioTickers(req.session.theUser.portfolioID);
+    let apiQuotes = await stockAPIs.getPortfolioQuotes(portfolioTickers);
+    console.log(portfolioObj);
+    var dashboardComponents = await portfolioHelpers.calculatePortfolio(portfolioObj, apiQuotes);
+    console.log('render');
+    res.render('dashboard', {userFirstName: req.session.theUser.userFirstName, portfolioObj: dashboardComponents.portfolioObj, apiQuotes: dashboardComponents.apiQuotes, netValue: dashboardComponents.netValue, allDayGain: dashboardComponents.allDayGain, cash: dashboardComponents.portfolioObj.cash});
+  }
 })
 
 // SIGN IN AND REGISTER PATHS
