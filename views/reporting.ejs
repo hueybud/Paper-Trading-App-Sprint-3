@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%-include('headTags')-%>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    <script>
+      $(document).ready(function(){
+        //start up scripts
+        if (document.getElementById('appName').value) {
+            document.getElementById('eaiCode').disabled = true;
+          } else {
+            document.getElementById('eaiCode').disabled = false;
+        }
+        if (document.getElementById('eaiCode').value) {
+            document.getElementById('appName').disabled = true;
+          } else {
+            document.getElementById('appName').disabled = false;
+        }
+
+        // dynamic scripts
+        $('#appName').on("input", function(){
+          if (document.getElementById('appName').value) {
+            document.getElementById('eaiCode').disabled = true;
+          } else {
+            document.getElementById('eaiCode').disabled = false;
+          }
+        });
+        $('#eaiCode').on("input", function(){
+          if (document.getElementById('eaiCode').value) {
+            document.getElementById('appName').disabled = true;
+          } else {
+            document.getElementById('appName').disabled = false;
+          }
+        });
+        $('#clearParams').on('click', function(){
+          document.getElementById('appName').value = "";
+          document.getElementById('eaiCode').value = "";
+          document.getElementById('appName').disabled = false;
+          document.getElementById('eaiCode').disabled = false;
+        });
+      });
+    </script>
+    <style>
+        .table tbody tr:first-child {
+          background-color: rgba(0,0,0,.05);
+        }
+        footer {
+          font-size: 10pt;
+          text-align: center;
+          background-color: #2B6499;
+          color: white;
+        }
+        /* only do for IE */
+        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+          html, body {
+            height: 100% !important;
+          } 
+        }
+    </style>
+    <title>APA Web</title>
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <% if (typeof userFirstName === "undefined"){ %>
+      <%-include('nav')-%>
+    <% } else{ %>
+      <%-include('navSignIn')-%>
+    <% } %>
+    <form method="GET" action="/searchApp" class="pl-2">
+      <h2 class="pt-2">APA Web Reporting</h2>
+      <div class="w-75 pb-3">
+        <input class="form-control w-50" type="text" name="appName" placeholder="Application Name" aria-label="App Name" value="<%=(queryParams.appName || '')%>" style="display: inline;" id="appName">
+        <label>or</label>
+        <input class="form-control w-25" type="text" name="eaiCode" placeholder="EAI Code" style="display: inline;" id="eaiCode" value="<%=(queryParams.eaiCode || '')%>">
+        <input type="hidden" name="page" value="1">
+      </div>
+      <input type="submit" value="Search" class="mb-3">
+      <input type="button" value="Clear Parameters" class="mb-3" id="clearParams">
+      <div class="float-right pr-2">
+        <%-paginationString-%>
+      </div>
+    </form>
+    <div class="table-responsive">
+      <table class="table">
+        <tr>
+          <!--
+          <th>ANF ID</th>
+          <th>Application ID</th>
+          -->
+          <th>Application Name</th>
+          <!--
+          <th>Deployment Date</th>
+          <th>Team Lead ID</th>
+          <th>Team Lead First Name</th>
+          <th>Team Lead Last Name</th>
+          <th>Project Lead ID</th>
+          <th>Project Lead First Name</th>
+          <th>Project Lead Last Name</th>
+          -->
+        </tr>
+        <% for (var i=0; i < searchResult.rowsAffected; i++) {%>
+          <tr>
+            <!--
+            <td><a href='/help'><%=searchResult.recordset[i].ANFID%></a></td>
+            <td><%=searchResult.recordset[i].APPLICATIONID%></td>
+            -->
+            <td><a href='/drillDownAppSearch?appID=<%=searchResult.recordset[i].APPLICATIONID%>&appName=<%=searchResult.recordset[i].ApplicationName%>&page=1'><%=searchResult.recordset[i].ApplicationName%></a></td>
+            <!--
+            <td><%=searchResult.recordset[i].DeploymentDate%></td>
+            <td><%=searchResult.recordset[i].TeamLeadID%></td>
+            <td><%=searchResult.recordset[i].TeamLeadFirstName%></td>
+            <td><%=searchResult.recordset[i].TeamLeadLastName%></td>
+            <td><%=searchResult.recordset[i].ProjectLeadID%></td>
+            <td><%=searchResult.recordset[i].ProjectLeadFirstName%></td>
+            <td><%=searchResult.recordset[i].ProjectLeadLastName%></td>
+            -->
+          </tr>
+        <%}%>
+      </table>
+      <h3 class="pl-2 text-danger"><%=noResultsParam%></h3>
+      <div class="float-right pr-2">
+        <%-paginationString-%>
+      </div>
+    </div>
+    <%-include ('footer')-%>
+  </body>
+</html>

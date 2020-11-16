@@ -85,7 +85,18 @@
                     }
                     for (var j = 0; j < result[Object.keys(result)[0]]['chart'].length; j+=10) {
                         if (j % 20 == 0) {
-                            var date = new Date(result[Object.keys(result)[0]]['chart'][j]['date']);
+                            if (j > 20) {
+                                var splitOldDate = result[Object.keys(result)[0]]['chart'][j-20]['date'].split("-")[1];
+                                var splitCurrentDate = result[Object.keys(result)[0]]['chart'][j]['date'].split("-")[1];
+                                if (splitOldDate == splitCurrentDate) {
+                                    var date = new Date(result[Object.keys(result)[0]]['chart'][j+10]['date']);
+                                } else {
+                                    var date = new Date(result[Object.keys(result)[0]]['chart'][j]['date']);
+                                }
+                            } else {
+                                var date = new Date(result[Object.keys(result)[0]]['chart'][j]['date']);
+                            }
+                            //var date = new Date(result[Object.keys(result)[0]]['chart'][j]['date']);
                             var month = date.toLocaleString('default', { month: 'short' });
                             labels.push(month);
                         } else {
@@ -225,7 +236,7 @@
                                             <%} else {%>
                                                 <td class="text-success"><%=(apiQuotes[Object.keys(apiQuotes)[i]].quote.changePercent * 100).toFixed(2)%>%</td>
                                                 <td>$<%=apiQuotes[Object.keys(apiQuotes)[i]].quote.latestPrice%></td>
-                                                <td class="text-danger">$<%=apiQuotes[Object.keys(apiQuotes)[i]].quote.change%></td>    
+                                                <td class="text-success">$<%=apiQuotes[Object.keys(apiQuotes)[i]].quote.change%></td>    
                                                 <td class="text-success">$<%=portfolioObj.stocks[i].dayGain%></td>    
                                             <%}%>                  
                                         </tr>
