@@ -3,37 +3,17 @@
   <head>
     <%-include('headTags')-%>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8">
     
     <script>
-      $(document).ready(function(){
+      $(document).ready(() => {
         //start up scripts
-        if (document.getElementById('appName').value) {
-            document.getElementById('eaiCode').disabled = true;
-          } else {
-            document.getElementById('eaiCode').disabled = false;
-        }
-        if (document.getElementById('eaiCode').value) {
-            document.getElementById('appName').disabled = true;
-          } else {
-            document.getElementById('appName').disabled = false;
+        if (!document.getElementById('appName').value) {
+            document.getElementById('appName').enabled = true;
         }
 
-        // dynamic scripts
-        $('#appName').on("input", function(){
-          if (document.getElementById('appName').value) {
-            document.getElementById('eaiCode').disabled = true;
-          } else {
-            document.getElementById('eaiCode').disabled = false;
-          }
-        });
-        $('#eaiCode').on("input", function(){
-          if (document.getElementById('eaiCode').value) {
-            document.getElementById('appName').disabled = true;
-          } else {
-            document.getElementById('appName').disabled = false;
-          }
-        });
-        $('#clearParams').on('click', function(){
+  
+        $('#clearParams').on('click', () => {
           document.getElementById('appName').value = "";
           document.getElementById('eaiCode').value = "";
           document.getElementById('appName').disabled = false;
@@ -58,7 +38,7 @@
           } 
         }
     </style>
-    <title>APA Web</title>
+    <title>Searching for Stocks</title>
   </head>
   <body class="d-flex flex-column min-vh-100">
     <% if (typeof userFirstName === "undefined"){ %>
@@ -67,15 +47,12 @@
       <%-include('navSignIn')-%>
     <% } %>
     <form method="GET" action="/searchApp" class="pl-2">
-      <h2 class="pt-2">APA Web Reporting</h2>
+      <h2 class="pt-2">Searching for Stocks</h2>
       <div class="w-75 pb-3">
-        <input class="form-control w-50" type="text" name="appName" placeholder="Application Name" aria-label="App Name" value="<%=(queryParams.appName || '')%>" style="display: inline;" id="appName">
-        <label>or</label>
-        <input class="form-control w-25" type="text" name="eaiCode" placeholder="EAI Code" style="display: inline;" id="eaiCode" value="<%=(queryParams.eaiCode || '')%>">
-        <input type="hidden" name="page" value="1">
+        <input class="form-control w-50" type="text" name="appName" placeholder="Ticker or Company Name" aria-label="App Name" value="<%=(queryParams.appName || '')%>" style="display: inline;" id="appName">
       </div>
       <input type="submit" value="Search" class="mb-3">
-      <input type="button" value="Clear Parameters" class="mb-3" id="clearParams">
+      <input type="button" value="Clear" class="mb-3" id="clearParams">
       <div class="float-right pr-2">
         <%-paginationString-%>
       </div>
@@ -83,20 +60,7 @@
     <div class="table-responsive">
       <table class="table">
         <tr>
-          <!--
-          <th>ANF ID</th>
-          <th>Application ID</th>
-          -->
-          <th>Application Name</th>
-          <!--
-          <th>Deployment Date</th>
-          <th>Team Lead ID</th>
-          <th>Team Lead First Name</th>
-          <th>Team Lead Last Name</th>
-          <th>Project Lead ID</th>
-          <th>Project Lead First Name</th>
-          <th>Project Lead Last Name</th>
-          -->
+          <th>Company or Ticker Name</th>
         </tr>
         <% for (var i=0; i < searchResult.rowsAffected; i++) {%>
           <tr>
@@ -105,15 +69,7 @@
             <td><%=searchResult.recordset[i].APPLICATIONID%></td>
             -->
             <td><a href='/drillDownAppSearch?appID=<%=searchResult.recordset[i].APPLICATIONID%>&appName=<%=searchResult.recordset[i].ApplicationName%>&page=1'><%=searchResult.recordset[i].ApplicationName%></a></td>
-            <!--
-            <td><%=searchResult.recordset[i].DeploymentDate%></td>
-            <td><%=searchResult.recordset[i].TeamLeadID%></td>
-            <td><%=searchResult.recordset[i].TeamLeadFirstName%></td>
-            <td><%=searchResult.recordset[i].TeamLeadLastName%></td>
-            <td><%=searchResult.recordset[i].ProjectLeadID%></td>
-            <td><%=searchResult.recordset[i].ProjectLeadFirstName%></td>
-            <td><%=searchResult.recordset[i].ProjectLeadLastName%></td>
-            -->
+
           </tr>
         <%}%>
       </table>
