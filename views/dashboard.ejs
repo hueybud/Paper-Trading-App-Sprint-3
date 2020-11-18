@@ -35,6 +35,9 @@
                         var prevClose = result[Object.keys(result)[i]]['quote']['previousClose'];
                         for (var j =0; j < result[Object.keys(result)[i]]['chart'].length; j+=30) {
                             var k = j;
+                            if (typeof result[Object.keys(result)[i]]['chart'][k] == "undefined") {
+                                console.log(i, j);
+                            }
                             while (result[Object.keys(result)[i]]['chart'][k]['average'] == null) {
                                 k++; 
                             }

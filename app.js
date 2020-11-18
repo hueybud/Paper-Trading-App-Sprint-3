@@ -14,6 +14,7 @@ var userModel = require('./models/UserModel');
 var stockAPIs = require('./stockAPIs/api');
 var loginHelpers = require('./helpers/loginHelpers');
 var portfolioHelpers = require('./helpers/portfolioHelpers');
+var searchHelpers = require('./helpers/searchHelpers');
 
 app.set('view engine', 'ejs');
 app.use('/assets', express.static(__dirname + '/assets'));
@@ -78,10 +79,22 @@ app.get('/dashboard', async function(req, res){
   }
 })
 
-app.get('/reporting', function (req, res) {
-  res.render('reporting', { searchResult: [], noResultsParam: '', queryParams: req.query, paginationString: '' });
+app.get('/stockSearch', function (req, res) {
+  res.render('stockSearch', { searchResult: [], noResultsParam: '', queryParams: req.query, paginationString: '' });
 })
 
+app.get('/searchApp', async function(req, res){
+  var stockResults = await searchHelpers.searchForStock(req.query.searchTerm);
+  var resultsMessage = "";
+  if (stockResults.length == 0) {
+    resultsMessage = "No Results Found";
+  }
+  if (req.session.theUser) {
+    res.render('stockSearch', { searchResult: stockResults, noResultsParam: resultsMessage, queryParams: req.query, paginationString: '',  userFirstName: req.session.theUser.userFirstName});
+  } else {
+    res.render('stockSearch', { searchResult: stockResults, noResultsParam: resultsMessage, queryParams: req.query, paginationString: '' });
+  }
+})
 // SIGN IN AND REGISTER PATHS
 
 

@@ -8,16 +8,9 @@
     <script>
       $(document).ready(() => {
         //start up scripts
-        if (!document.getElementById('appName').value) {
-            document.getElementById('appName').enabled = true;
-        }
-
   
         $('#clearParams').on('click', () => {
-          document.getElementById('appName').value = "";
-          document.getElementById('eaiCode').value = "";
-          document.getElementById('appName').disabled = false;
-          document.getElementById('eaiCode').disabled = false;
+          document.getElementById('searchTerm').value = "";
         });
       });
     </script>
@@ -49,7 +42,7 @@
     <form method="GET" action="/searchApp" class="pl-2">
       <h2 class="pt-2">Searching for Stocks</h2>
       <div class="w-75 pb-3">
-        <input class="form-control w-50" type="text" name="appName" placeholder="Ticker or Company Name" aria-label="App Name" value="<%=(queryParams.appName || '')%>" style="display: inline;" id="appName">
+        <input class="form-control w-50" type="text" name="searchTerm" placeholder="Ticker or Company Name" aria-label="Ticker or Company Name" value="<%=(queryParams.searchTerm || '')%>" style="display: inline;" id="searchTerm">
       </div>
       <input type="submit" value="Search" class="mb-3">
       <input type="button" value="Clear" class="mb-3" id="clearParams">
@@ -60,16 +53,11 @@
     <div class="table-responsive">
       <table class="table">
         <tr>
-          <th>Company or Ticker Name</th>
+          <th>Ticker - Company Name</th>
         </tr>
-        <% for (var i=0; i < searchResult.rowsAffected; i++) {%>
+        <% for (var i=0; i < searchResult.length; i++) {%>
           <tr>
-            <!--
-            <td><a href='/help'><%=searchResult.recordset[i].ANFID%></a></td>
-            <td><%=searchResult.recordset[i].APPLICATIONID%></td>
-            -->
-            <td><a href='/drillDownAppSearch?appID=<%=searchResult.recordset[i].APPLICATIONID%>&appName=<%=searchResult.recordset[i].ApplicationName%>&page=1'><%=searchResult.recordset[i].ApplicationName%></a></td>
-
+            <td><a href='/stock?ticker=<%=searchResult[i].ticker%>'><%=searchResult[i].ticker%> - <%=searchResult[i].name%></a></td>
           </tr>
         <%}%>
       </table>
