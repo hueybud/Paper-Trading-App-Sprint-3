@@ -39,8 +39,8 @@
     <% } else{ %>
       <%-include('navSignIn')-%>
     <% } %>
-    <form method="GET" action="/searchApp" class="pl-2">
-      <h2 class="pt-2">Searching for Stocks</h2>
+    <form method="GET" action="/searchStock" class="pl-2">
+      <h2 class="pt-2">Search For Stocks</h2>
       <div class="w-75 pb-3">
         <input class="form-control w-50" type="text" name="searchTerm" placeholder="Ticker or Company Name" aria-label="Ticker or Company Name" value="<%=(queryParams.searchTerm || '')%>" style="display: inline;" id="searchTerm">
       </div>

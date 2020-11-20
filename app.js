@@ -74,16 +74,23 @@ app.get('/dashboard', async function(req, res){
     console.log(apiQuotes);
     console.log(portfolioObj);
     var dashboardComponents = await portfolioHelpers.calculatePortfolio(portfolioObj, apiQuotes);
-    console.log('render');
     res.render('dashboard', {userFirstName: req.session.theUser.userFirstName, portfolioObj: dashboardComponents.portfolioObj, apiQuotes: dashboardComponents.apiQuotes, netValue: dashboardComponents.netValue, allDayGain: dashboardComponents.allDayGain, cash: dashboardComponents.portfolioObj.cash});
   }
 })
 
 app.get('/stockSearch', function (req, res) {
-  res.render('stockSearch', { searchResult: [], noResultsParam: '', queryParams: req.query, paginationString: '' });
+  if (req.session.theUser) {
+    res.render('stockSearch', { searchResult: [], noResultsParam: '', queryParams: req.query, paginationString: '', userFirstName: req.session.theUser.userFirstName });
+  } else {
+
+    // UNCOMMENT THIS FOR DEV
+
+    //res.redirect('/signin');
+    res.render('stockSearch', { searchResult: [], noResultsParam: '', queryParams: req.query, paginationString: '' });
+  }
 })
 
-app.get('/searchApp', async function(req, res){
+app.get('/searchStock', async function(req, res){
   var stockResults = await searchHelpers.searchForStock(req.query.searchTerm);
   var resultsMessage = "";
   if (stockResults.length == 0) {
@@ -95,6 +102,18 @@ app.get('/searchApp', async function(req, res){
     res.render('stockSearch', { searchResult: stockResults, noResultsParam: resultsMessage, queryParams: req.query, paginationString: '' });
   }
 })
+
+app.get('/stock', async function(req, res){
+  var stockResult = await stockAPIs.getStockQuote(req.query.ticker);
+  var yahooResult = await stockAPIs.getYahooStockQuote(req.query.ticker);
+  res.render('stock', {stockResult: stockResult, yahooResult: yahooResult, ticker: req.query.ticker});
+})
+
+app.get('/getStockChart', async function(req, res){
+  let chartResult = await stockAPIs.getStockChart(req.query.ticker, req.query.range);
+  res.json(chartResult);
+})
+
 // SIGN IN AND REGISTER PATHS
 
 
