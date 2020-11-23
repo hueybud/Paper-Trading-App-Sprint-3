@@ -36,10 +36,23 @@ function getNewUserID() {
 }
 
 function addUser(user) {
+    return new Promise(async function(resolve, reject){
+        var doesUserExist = await getUserByUsername(user.userName);
+        if (doesUserExist == undefined) {
+            var newUser = new User(user);
+            newUser.save(function(err, addedUser){
+                resolve("user added");
+            })
+        } else {
+            resolve("user already exists");
+        }
+    })
+}
+
+function removeUserByUsername(username) {
     return new Promise(function(resolve, reject){
-        var newUser = new User(user);
-        newUser.save(function(err, addedUser){
-            resolve("user added");
+        User.deleteOne({userName: username}, function(err, removed){
+            resolve(removed);
         })
     })
 }
@@ -56,3 +69,4 @@ module.exports.user = user;
 module.exports.getUserByUsername = getUserByUsername;
 module.exports.getNewUserID = getNewUserID;
 module.exports.addUser = addUser;
+module.exports.removeUserByUsername = removeUserByUsername;

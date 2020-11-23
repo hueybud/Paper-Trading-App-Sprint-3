@@ -33,23 +33,41 @@
             var labels;
             var data;
             var myChart;
+            var errorMessage;
             function formatIndexResults(result, range, update) {
+                $('#myChart').show();
+                $('#chartErrorMessage').hide();
+                errorMessage = "";
                 labels = [];
                 data = [];
                 console.log(result);
-                if (range == "1d") {
+                if (result[Object.keys(result)[0]]['chart'].length != 0) {
+                    if (range == "1d") {
                     for (var i =0; i < Object.keys(result).length; i++) {
                         var innerData = [];
                         var prevClose = result[Object.keys(result)[i]]['quote']['previousClose'];
                         for (var j =0; j < result[Object.keys(result)[i]]['chart'].length; j+=30) {
                             var k = j;
-                            if (typeof result[Object.keys(result)[i]]['chart'][k] == "undefined") {
+                            if (result[Object.keys(result)[i]]['chart'][k]['average'] == null) {
                                 console.log(i, j);
                             }
-                            while (result[Object.keys(result)[i]]['chart'][k]['average'] == null) {
-                                k++; 
+                            console.log(i, k);
+                            console.log(result[Object.keys(result)[i]]['chart'][k]['average'] === null);
+                            try {
+                                while (!result[Object.keys(result)[i]]['chart'][k]['average']) {
+                                    if (k > 60) {
+                                        errorMessage = "too much null data to produce chart";
+                                        break;
+                                    }
+                                    k++; 
+                                }
+                            } catch {
+                                console.log(i, j);
                             }
-                            console.log(result[Object.keys(result)[i]]['chart'][k]['minute'])
+                            if (errorMessage != "") {
+                                break;
+                            }
+                            //console.log(result[Object.keys(result)[i]]['chart'][k]['minute'])
                             var averagePrice = result[Object.keys(result)[i]]['chart'][k]['average'];
                             var percentChange = ((averagePrice - prevClose)/prevClose)*100;
                             innerData.push(percentChange);
@@ -116,16 +134,18 @@
                     }
                 }
                 console.log(labels);
-                createChart();
-/*                 if (update) {
-                    ctx.data.datasets[0] = data[0];
-                    ctx.data.datasets[1] = data[1];
-                    ctx.data.datasets[2] = data[2];
-                    ctx.data.labels = labels;
-                    //myChart.update();
-                } else {
+                if (errorMessage != "too much null data to produce chart") {
                     createChart();
-                } */
+                } else {
+                    $('#myChart').hide();
+                    $('#chartErrorMessage').show();
+                    $('#chartErrorMessage').text("Error creating chart");
+                }
+                } else {
+                    $('#myChart').hide();
+                    $('#chartErrorMessage').show();
+                    $('#chartErrorMessage').text("Error creating chart");
+                }
             }
             function callChartAPI(ticker, range) {
                 $.ajax({
@@ -143,7 +163,7 @@
                     labels: labels,
                     datasets: [{ 
                         data: data[0],
-                        label: ticker,
+                        label: ticker.toUpperCase(),
                         borderColor: "#3e95cd",
                         fill: false
                     }]
@@ -164,7 +184,9 @@
             }
             callChartAPI(ticker, '1d');
             $('.indexButtons').click(function(){
-                myChart.destroy();
+                if (myChart != undefined) {
+                    myChart.destroy();
+                }
                 var id = $(this).attr('id');
                 callChartAPI(ticker, id);
             })
@@ -197,9 +219,21 @@
                                 </tr>
                                 <tr>
                                     <td>$<%=stockResult.latestPrice.toFixed(2)%></td>
-                                    <td><%=stockResult.change%> (<%=(stockResult.changePercent * 100).toFixed(2)%>%)</td>
-                                    <td>$<%=stockResult.iexBidPrice.toFixed(2)%></td>
-                                    <td>$<%=stockResult.iexAskPrice.toFixed(2)%></td>
+                                    <% if (stockResult.changePercent<0) {%>
+                                        <td class="text-danger"><%=stockResult.change.toFixed(2)%> (<%=(stockResult.changePercent * 100).toFixed(2)%>%)</td>
+                                    <%} else {%>
+                                        <td class="text-success"><%=stockResult.change.toFixed(2)%> (<%=(stockResult.changePercent * 100).toFixed(2)%>%)</td>
+                                    <%}%>
+                                    <% if (typeof yahooResult != "undefined") {%>
+                                        <td>$<%=yahooResult.summaryDetail.bid.toFixed(2)%></td>
+                                    <%} else {%>
+                                        <td class="text-warning">N/A</td>
+                                    <%}%>
+                                    <% if (typeof yahooResult != "undefined") {%>
+                                        <td>$<%=yahooResult.summaryDetail.ask.toFixed(2)%></td>
+                                    <%} else {%>
+                                        <td class="text-warning">N/A</td>
+                                    <%}%>
                                 </tr>
                             </table>
                         </div>
@@ -224,7 +258,11 @@
                                 <div class="pl-2 pt-2"> 
                                     <div style="border-bottom: 1px solid #dee2e6; display: flex;">
                                         <b><p class="mr-auto">Open</p></b>
-                                        <p class="ml-auto">$<%=yahooResult.summaryDetail.open.toFixed(2)%></p>
+                                        <% if (typeof yahooResult != "undefined") {%>
+                                            <p class="ml-auto">$<%=yahooResult.summaryDetail.open.toFixed(2)%></p>
+                                        <%} else {%>
+                                            <p class="ml-auto text-warning">N/A</p>
+                                        <%}%>
                                     </div>
                                     <div class="pt-3" style="border-bottom: 1px solid #dee2e6; display: flex;">
                                         <b><p class="mr-auto">Previous Close</p></b>
@@ -232,11 +270,19 @@
                                     </div>
                                     <div class="pt-3" style="border-bottom: 1px solid #dee2e6; display: flex;">
                                         <b><p class="mr-auto">Day Range</p></b>
-                                        <p class="ml-auto">$<%=yahooResult.summaryDetail.dayLow.toFixed(2)%> - $<%=yahooResult.summaryDetail.dayHigh.toFixed(2)%></p>
+                                        <% if (typeof yahooResult != "undefined") {%>
+                                            <p class="ml-auto">$<%=yahooResult.summaryDetail.dayLow.toFixed(2)%> - $<%=yahooResult.summaryDetail.dayHigh.toFixed(2)%></p>
+                                        <%} else {%>
+                                            <p class="ml-auto text-warning">N/A</p>
+                                        <%}%>
                                     </div>
                                     <div class="pt-3" style="border-bottom: 1px solid #dee2e6; display: flex;">
                                         <b><p class="mr-auto">52 Week Range</p></b>
-                                        <p class="ml-auto">$<%=yahooResult.summaryDetail.fiftyTwoWeekLow.toFixed(2)%> - $<%=yahooResult.summaryDetail.fiftyTwoWeekHigh.toFixed(2)%></p>
+                                        <% if (typeof yahooResult != "undefined") {%>
+                                            <p class="ml-auto">$<%=yahooResult.summaryDetail.fiftyTwoWeekLow.toFixed(2)%> - $<%=yahooResult.summaryDetail.fiftyTwoWeekHigh.toFixed(2)%></p>
+                                        <%} else {%>
+                                            <p class="ml-auto text-warning">N/A</p>
+                                        <%}%>
                                     </div>
                                 </div>
                             </div>
@@ -244,11 +290,23 @@
                                 <div class="pl-2 pt-2"> 
                                     <div style="border-bottom: 1px solid #dee2e6; display: flex;">
                                         <b><p class="mr-auto">Earnings Date</p></b>
-                                        <p class="ml-auto"><%=new Date(stockResult.earningsDate).toLocaleDateString()%></p>
+                                        <% if (stockResult.earningsDate == undefined) {%>
+                                            <p class="ml-auto text-warning">N/A</p>
+                                        <%} else {%>
+                                            <p class="ml-auto"><%=new Date(stockResult.earningsDate).toLocaleDateString()%></p>
+                                        <%}%>
                                     </div>
                                     <div class="pt-3" style="border-bottom: 1px solid #dee2e6; display: flex;">
                                         <b><p class="mr-auto">P/E ratio</p></b>
-                                        <p class="ml-auto">$<%=yahooResult.summaryDetail.trailingPE.toFixed(2)%></p>
+                                        <% if (typeof yahooResult != "undefined") {%>
+                                            <% if (yahooResult.summaryDetail.trailingPE == undefined) {%>
+                                                <p class="ml-auto text-warning">N/A</p>
+                                            <%} else {%>
+                                                <p class="ml-auto">$<%=yahooResult.summaryDetail.trailingPE.toFixed(2)%></p>
+                                            <%}%>
+                                        <%} else {%>
+                                            <p class="ml-auto text-warning">N/A</p>
+                                        <%}%>
                                     </div>
                                     <div class="pt-3" style="border-bottom: 1px solid #dee2e6; display: flex;">
                                         <b><p class="mr-auto">Volume</p></b>
@@ -256,7 +314,15 @@
                                     </div>
                                     <div class="pt-3" style="border-bottom: 1px solid #dee2e6; display: flex;">
                                         <b><p class="mr-auto">Dividend Yield</p></b>
-                                        <p class="ml-auto">$<%=(yahooResult.summaryDetail.dividendYield * 100).toFixed(2)%>%</p>
+                                        <% if (typeof yahooResult != "undefined") {%>
+                                            <% if (yahooResult.summaryDetail.dividendYield == undefined) {%>
+                                                <p class="ml-auto text-warning">N/A</p>
+                                            <%} else {%>
+                                                <p class="ml-auto"><%=(yahooResult.summaryDetail.dividendYield * 100).toFixed(2)%>%</p>
+                                            <%}%>
+                                        <%} else {%>
+                                            <p class="ml-auto text-warning">N/A</p>
+                                        <%}%>
                                     </div>
                                 </div>
                             </div>
@@ -267,7 +333,8 @@
             <div class="col-lg-6">
                 <h3 class="pt-2 pl-2">Stock Performance</h3>
                 <canvas id="myChart"></canvas>
-                <div class="buttons-flex pb-2">
+                <h3 id="chartErrorMessage" class="text-danger pl-2 pt-2 pb-3"></h3>
+                <div class="buttons-flex pb-2" id="chart-buttons">
                     <button type="button" class="btn btn-secondary btn-sm mr-1 indexButtons" id="1d">1D</button>
                     <button type="button" class="btn btn-secondary btn-sm mr-1 indexButtons" id="5d">1W</button>
                     <button type="button" class="btn btn-secondary btn-sm mr-1 indexButtons" id="1m">1M</button>

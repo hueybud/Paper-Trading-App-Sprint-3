@@ -234,12 +234,12 @@
                                             <% if (apiQuotes[Object.keys(apiQuotes)[i]].quote.changePercent < 0) {%>
                                                 <td class="text-danger"><%=(apiQuotes[Object.keys(apiQuotes)[i]].quote.changePercent * 100).toFixed(2)%>%</td>
                                                 <td>$<%=apiQuotes[Object.keys(apiQuotes)[i]].quote.latestPrice%></td>
-                                                <td class="text-danger">-$<%=Math.abs(apiQuotes[Object.keys(apiQuotes)[i]].quote.change)%></td>    
+                                                <td class="text-danger">-$<%=Math.abs(apiQuotes[Object.keys(apiQuotes)[i]].quote.change).toFixed(2)%></td>    
                                                 <td class="text-danger">-$<%=Math.abs(portfolioObj.stocks[i].dayGain)%></td>    
                                             <%} else {%>
                                                 <td class="text-success"><%=(apiQuotes[Object.keys(apiQuotes)[i]].quote.changePercent * 100).toFixed(2)%>%</td>
                                                 <td>$<%=apiQuotes[Object.keys(apiQuotes)[i]].quote.latestPrice%></td>
-                                                <td class="text-success">$<%=apiQuotes[Object.keys(apiQuotes)[i]].quote.change%></td>    
+                                                <td class="text-success">$<%=(apiQuotes[Object.keys(apiQuotes)[i]].quote.change).toFixed(2)%></td>    
                                                 <td class="text-success">$<%=portfolioObj.stocks[i].dayGain%></td>    
                                             <%}%>                  
                                         </tr>

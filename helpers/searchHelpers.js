@@ -15,7 +15,7 @@ function searchForStock(inputString) {
 }
 
 // async function test() {
-//     searchForStock('apple');
+//     searchForStock('dinasour');
 // }
 
 // test();

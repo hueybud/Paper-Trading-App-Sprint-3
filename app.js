@@ -36,7 +36,7 @@ app.listen('3000', function() {
 
 app.get('/', function (req, res) {
   if (req.session.theUser) {
-    res.render('index', { userFirstName: req.session.theUser.userFirstName});
+    res.redirect('/dashboard')
   } else {
     res.render('index');
   }
@@ -44,7 +44,7 @@ app.get('/', function (req, res) {
 
 app.get('/index', function (req, res) {
   if (req.session.theUser) {
-    res.render('index', { userFirstName: req.session.theUser.userFirstName});
+    res.redirect('/dashboard')
   } else {
     res.render('index');
   }
@@ -82,11 +82,8 @@ app.get('/stockSearch', function (req, res) {
   if (req.session.theUser) {
     res.render('stockSearch', { searchResult: [], noResultsParam: '', queryParams: req.query, paginationString: '', userFirstName: req.session.theUser.userFirstName });
   } else {
-
-    // UNCOMMENT THIS FOR DEV
-
-    //res.redirect('/signin');
-    res.render('stockSearch', { searchResult: [], noResultsParam: '', queryParams: req.query, paginationString: '' });
+    res.redirect('/signin');
+    //res.render('stockSearch', { searchResult: [], noResultsParam: '', queryParams: req.query, paginationString: '' });
   }
 })
 
@@ -104,9 +101,19 @@ app.get('/searchStock', async function(req, res){
 })
 
 app.get('/stock', async function(req, res){
-  var stockResult = await stockAPIs.getStockQuote(req.query.ticker);
-  var yahooResult = await stockAPIs.getYahooStockQuote(req.query.ticker);
-  res.render('stock', {stockResult: stockResult, yahooResult: yahooResult, ticker: req.query.ticker});
+  if (!req.session.theUser) {
+    res.redirect('/signin');
+  } else {
+    var stockResult = await stockAPIs.getStockQuote(req.query.ticker);
+    var yahooResult = await stockAPIs.getYahooStockQuote(req.query.ticker);
+    console.log(stockResult.latestPrice);
+    //console.log(yahooResult);
+    if (stockResult == "stock quote could not be created" && yahooResult == undefined) {
+      res.redirect('/signin');
+    } else {
+      res.render('stock', {stockResult: stockResult, yahooResult: yahooResult, ticker: req.query.ticker, userFirstName: req.session.theUser.userFirstName});
+    }
+  }
 })
 
 app.get('/getStockChart', async function(req, res){
@@ -138,7 +145,7 @@ function register(req) {
 
 app.get('/signin', function (req, res) {
   if (req.session.theUser) {
-    res.redirect('index');
+    res.redirect('/dashboard');
   } else {
     res.render('signin', { errorMessage: [] });
   }
@@ -148,7 +155,7 @@ app.get('/register', function (req, res) {
   if (!req.session.theUser) {
     res.render('register', { errorMessage: [] });
   } else {
-    res.redirect('index');
+    res.redirect('/dashboard');
   }
 })
 
