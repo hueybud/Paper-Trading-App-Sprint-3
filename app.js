@@ -8,7 +8,6 @@ app.use(session({ secret: 'ilovemet'}));
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-
 var portfolioModel = require('./models/PortfolioModel');
 var userModel = require('./models/UserModel');
 var stockAPIs = require('./stockAPIs/api');

@@ -7,7 +7,11 @@ var api_key = fs.readFileSync(path.resolve(__dirname, "./iexAPI.txt"), "utf-8");
 function getPortfolioQuotes(portfolioTickers) {
     return new Promise(async function(resolve, reject){
         if (portfolioTickers.length != 0) {
+<<<<<<< HEAD
             var apiResponse = await fetch('https://cloud.iexapis.com/v1/stock/market/batch?&types=quote&symbols=' + portfolioTickers.toString() + '&token=' + api_key);
+=======
+            var apiResponse = await fetch('https://sandbox.iexapis.com/v1/stock/market/batch?&types=quote&symbols=' + portfolioTickers.toString() + '&token=' + api_key);
+>>>>>>> 7ce4fa9e8a60b0060e89e51da98aee8b6eb997c7
             apiResponse.json().then(result => {
                 resolve(result);
             }).catch(err => {

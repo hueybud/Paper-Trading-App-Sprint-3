@@ -19,12 +19,20 @@ test('getting the stock quote for a stock that is known to not exist (DINASOUR) 
     Testing the getYahooStockQuote() function
 */
 
+<<<<<<< HEAD
 test('getting the stock quote for a stock that is known to exist (AAPL) from the Yahoo API', async function(){
+=======
+test('getting the stock quote for a stock that is known to exist (AAPL) from the IEX API', async function(){
+>>>>>>> 7ce4fa9e8a60b0060e89e51da98aee8b6eb997c7
     var result = await api.getYahooStockQuote('AAPL');
     expect(result).not.toBe(undefined);
 })
 
+<<<<<<< HEAD
 test('getting the stock quote for a stock that is known to not exist (DINASOUR) from the Yahoo API', async function(){
+=======
+test('getting the stock quote for a stock that is known to not exist (DINASOUR) from the IEX API', async function(){
+>>>>>>> 7ce4fa9e8a60b0060e89e51da98aee8b6eb997c7
     var result = await api.getYahooStockQuote('DINASOUR');
     expect(result).toBe(undefined);
 })
