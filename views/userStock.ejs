@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%-include('headTags')-%>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8">
+    
+    <script>
+      $(document).ready(() => {
+        //start up scripts
+
+  
+        $('#clearParams').on('click', () => {
+          document.getElementById('searchTerm').value = "";
+        });
+      });
+    </script>
+    <style>
+        .table tbody tr:first-child {
+          background-color: rgba(0,0,0,.05);
+        }
+        footer {
+          font-size: 10pt;
+          text-align: center;
+          background-color: #2B6499;
+          color: white;
+        }
+        /* only do for IE */
+        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+          html, body {
+            height: 100% !important;
+          } 
+        }
+        h2{
+          color: blue;
+        }
+        h5{
+          color: red;
+
+        }
+
+       
+    </style>
+    <title>Your Stocks</title>
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <% if (typeof userFirstName === "undefined"){ %>
+      <%-include('nav')-%>
+    <% } else{ %>
+      <%-include('navSignIn')-%>
+    <% } %>
+    <form method="GET" action="/stocklist" class="pl-2">
+    <div class="table-responsive">
+      <table class="table">
+        
+
+        <% if(search == "empty portfolio"){ %>
+          <h2>You do not have any stock in your portfolio !!</h2>
+        <% } else{ %>  
+          <tr>
+            <th>Stock Ticker</th><th>Company Name</th><th>High</th><th>Low</th><th>Latest Price</th>
+            <th>Latest Volume</th><th>Change</th><th>Change Percent %</th><th>Day Gain</th><th>Total Gain</th>
+            <th>52 Week High</th><th>52 Week Low</th><th>Cost Basis</th>
+          </tr>
+  
+      <% for (var i=0; i < Object.keys(search).length; i++) {%>
+        <tr>
+
+            <td><a href='/stock?ticker=<%=Object.keys(search)[i]%>'><%=Object.keys(search)[i]%></a></td>
+            
+            <% if(search[Object.keys(search)[i]]['quote']['companyName'] != null){ %>
+              <td><h6><%=search[Object.keys(search)[i]]['quote']['companyName']%></h6></td>
+              <% } else{ %>  
+                <td><h5>NA</h5></td>
+      
+                 <% } %>
+
+
+                 <% if(search[Object.keys(search)[i]]['quote']['high'] != null){ %>
+                  <td><h6><%=search[Object.keys(search)[i]]['quote']['high']%></h6></td>
+                  <% } else{ %>  
+                    <td><h5>NA</h5></td>
+          
+                     <% } %>
+                 
+
+                     <% if(search[Object.keys(search)[i]]['quote']['low'] != null){ %>
+                      <td><h6><%=search[Object.keys(search)[i]]['quote']['low']%></h6></td>
+                      <% } else{ %>  
+                        <td><h5>NA</h5></td>
+              
+                         <% } %>
+
+
+                     <% if(search[Object.keys(search)[i]]['quote']['latestPrice'] != null){ %>
+                      <td><h6><%=search[Object.keys(search)[i]]['quote']['latestPrice']%></h6></td>
+                      <% } else{ %>  
+                        <td><h5>NA</h5></td>
+              
+                         <% } %>
+
+                         <% if(search[Object.keys(search)[i]]['quote']['latestVolume'] != null){ %>
+                          <td><h6><%=search[Object.keys(search)[i]]['quote']['latestVolume'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")%></h6></td>
+                          <% } else{ %>  
+                            <td><h5>NA</h5></td>
+                  
+                             <% } %>
+
+                             <% if(search[Object.keys(search)[i]]['quote']['change'] != null){ %>
+                              <td><h6><%=search[Object.keys(search)[i]]['quote']['change']%></h6></td>
+                              <% } else{ %>  
+                                <td><h5>NA</h5></td>
+                      
+                                 <% } %>
+
+                                 <% if(search[Object.keys(search)[i]]['quote']['changePercent'] != null){ %>
+                                  <td><h6><%=search[Object.keys(search)[i]]['quote']['changePercent']%></h6></td>
+                                  <% } else{ %>  
+                                    <td><h5>NA</h5></td>
+                          
+                                     <% } %>
+
+                                     <% if(search[Object.keys(search)[i]]['quote']['dayGain'] != null){ %>
+                                      <td><h6><%=search[Object.keys(search)[i]]['quote']['dayGain']%></h6></td>
+                                      <% } else{ %>  
+                                        <td><h5>NA</h5></td>
+                              
+                                         <% } %>
+                                         <% if(search[Object.keys(search)[i]]['quote']['totalGain'] != null){ %>
+                                          <td><h6><%=search[Object.keys(search)[i]]['quote']['totalGain']%></h6></td>
+                                          <% } else{ %>  
+                                            <td><h5>NA</h5></td>
+                                  
+                                             <% } %>
+
+                                             <% if(search[Object.keys(search)[i]]['quote']['week52High'] != null){ %>
+                                              <td><h6><%=search[Object.keys(search)[i]]['quote']['week52High']%></h6></td>
+                                              <% } else{ %>  
+                                                <td><h5>NA</h5></td>
+                                      
+                                                 <% } %>
+
+
+                                             <% if(search[Object.keys(search)[i]]['quote']['week52Low'] != null){ %>
+                                              <td><h6><%=search[Object.keys(search)[i]]['quote']['week52Low']%></h6></td>
+                                              <% } else{ %>  
+                                                <td><h5>NA</h5></td>
+                                      
+                                                 <% } %>
+                                                 <% if(search[Object.keys(search)[i]]['quote']['costBasis'] != null){ %>
+                                                  <td><h6><%=search[Object.keys(search)[i]]['quote']['costBasis']%></h6></td>
+                                                  <% } else{ %>  
+                                                    <td><h5>NA</h5></td>
+                                          
+                                                     <% } %>
+        </tr> 
+      <%}%>       <% } %>
+
+
+
+   
+        
+
+       
+        
+
+      
+
+
+
+
+
+      </table>
+      <h3 class="pl-2 text-danger"><%=noResultsParam%></h3>
+      <div class="float-right pr-2">
+        <%-paginationString-%>
+      </div>
+    </div>
+    </form>
+    <%-include ('footer')-%>
+  </body>
+</html>

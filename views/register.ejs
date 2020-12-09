@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%-include('headTags')-%>
+    <style>
+      footer {
+        font-size: 10pt;
+        text-align: center;
+        background-color: #2B6499;
+        color: white;
+      }
+      html, body{
+        height: 100%;
+      }
+      #signIn {
+        font-weight: bold;
+        background-color: #1877f2;
+        border-color: #1877f2;
+        color: white;
+      }
+      #register {
+        font-weight: bold;
+        background-color: #42b72a;
+        border-color: #42b72a;
+        color: white;
+      }
+    </style>
+    <title>Optimist</title>
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <%-include('nav')-%>
+    <h2 class="pl-2 pt-2">Register</h2>
+    <div class="container h-100">
+        <div class="row align-items-center h-100">
+            <div class="col-6 mx-auto">
+                <div>
+                    <form method="POST" action="/register">
+                        <div class="mx-auto w-50">
+                            <%if (errorMessage.length) {%>
+                                <div class="pb-2">
+                                    <h3 class="text-danger" style="text-align: center;"><%=errorMessage%></h3>
+                                </div>
+                            <%}%>
+                            <div class="pb-2">
+                                <input type="text" class="form-control" name="userFirstName" placeholder="First Name" required>
+                            </div>
+                            <div class="pb-2">
+                                <input type="text" class="form-control" name="userLastName" placeholder="Last Name" required>
+                            </div>
+                            <div class="pb-2">
+                                <input type="text" class="form-control" name="userName" placeholder="Username" required>
+                            </div>
+                            <div class="pb-2">
+                              <input type="password" class="form-control" name="password" placeholder="Password" required>
+                            </div>
+                            <div class="pb-2">
+                              <input type="password" class="form-control" name="confirmPassword" placeholder="Confirm Password" required>
+                            </div>
+                            <div class="pb-3">
+                                <input type="submit" class="form-control" value="Register" id="register" style="font-weight: bold">
+                            </div>
+                            <div class="pb-3" style="border-top: 1px solid #dadde1;">
+
+                            </div>
+                            <div>
+                                <a href="/signin" style="text-decoration: none;">
+                                    <input type="button" class="form-control" value="Sign In" id="signIn" style="font-weight: bold">
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%-include ('footer')-%>
+  </body>
+</html>

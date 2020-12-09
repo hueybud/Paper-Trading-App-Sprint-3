@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%-include('headTags')-%>
+    <style>
+      footer {
+        font-size: 10pt;
+        text-align: center;
+        background-color: #2B6499;
+        color: white;
+      }
+      html, body{
+          height: 100%;
+      }
+    </style>
+    <title>Optimist</title>
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <% if (typeof userFirstName === "undefined"){ %>
+      <%-include('nav')-%>
+    <% } else{ %>
+      <%-include('navSignIn')-%>
+    <% } %>
+    <h2 class="pl-2 pt-2">Welcome!</h2>
+    <!--
+    <div class="container-fluid">
+      <div class="row">
+          <div class="col-lg">
+            <ul>
+              <li><a href='/reporting'>APA Web Reporting</a></li>
+              <li><a href='/scorecardReporting'>APA Performance Scorecard Intake and Retrieval</a></li>
+              <li><a href='/training'>Training Modules</a></li>
+              <li><a href="/signin">Sign In</a> or <a href="/register">Register</a></li> 
+            </ul>
+          </div>
+      </div>
+    </div>
+    -->
+    <%-include ('footer')-%>
+  </body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%-include('headTags')-%>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8">
+    
+    <script>
+      $(document).ready(() => {
+        //start up scripts
+  
+        $('#clearParams').on('click', () => {
+          document.getElementById('searchTerm').value = "";
+        });
+      });
+    </script>
+    <style>
+        .table tbody tr:first-child {
+          background-color: rgba(0,0,0,.05);
+        }
+        footer {
+          font-size: 10pt;
+          text-align: center;
+          background-color: #2B6499;
+          color: white;
+        }
+        /* only do for IE */
+        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+          html, body {
+            height: 100% !important;
+          } 
+        }
+    </style>
+    <title>Searching for Stocks</title>
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <% if (typeof userFirstName === "undefined"){ %>
+      <%-include('nav')-%>
+    <% } else{ %>
+      <%-include('navSignIn')-%>
+    <% } %>
+    <form method="GET" action="/searchStock" class="pl-2">
+      <h2 class="pt-2">Search For Stocks</h2>
+      <div class="w-75 pb-3">
+        <input class="form-control w-50" type="text" name="searchTerm" placeholder="Ticker or Company Name" aria-label="Ticker or Company Name" value="<%=(queryParams.searchTerm || '')%>" style="display: inline;" id="searchTerm">
+      </div>
+      <input type="submit" value="Search" class="mb-3">
+      <input type="button" value="Clear" class="mb-3" id="clearParams">
+      <div class="float-right pr-2">
+        <%-paginationString-%>
+      </div>
+    </form>
+    <div class="table-responsive">
+      <table class="table">
+        <tr>
+          <th>Ticker - Company Name</th>
+        </tr>
+        <% for (var i=0; i < searchResult.length; i++) {%>
+          <tr>
+            <td><a href='/stock?ticker=<%=searchResult[i].ticker%>'><%=searchResult[i].ticker%> - <%=searchResult[i].name%></a></td>
+          </tr>
+        <%}%>
+      </table>
+      <h3 class="pl-2 text-danger"><%=noResultsParam%></h3>
+      <div class="float-right pr-2">
+        <%-paginationString-%>
+      </div>
+    </div>
+    <%-include ('footer')-%>
+  </body>
+</html>
