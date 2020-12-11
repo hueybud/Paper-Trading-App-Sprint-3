@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%-include('headTags')-%>
+    <script>
+        $(document).ready(() => {
+            //start up scripts
+            var currentPrice = 0;
+            var shares = 0;
+            var estimatedTotal = 0;
+            $('#ticker').on('change',function(){
+                // make ajax call
+                $.ajax({
+                    url: '/getStockQuote',
+                    type: 'POST',
+                    data: JSON.stringify({ticker: $('#ticker').val()}),
+                    contentType: 'application/json',
+                    success: function(result) {
+                        console.log(result);
+                        formatGetStockQuoteResults(result);
+                    }
+                })
+                // do math on other fields
+            })
+
+            $('#shares').on('change',function(){
+                if ($('#currentPrice').val() != "") {
+                    estimatedTotal = (parseFloat(currentPrice) * parseFloat($("#shares").val())).toFixed(2);
+                    $('#estimatedTotal').val("$" + estimatedTotal);
+                }
+            })
+
+            function formatGetStockQuoteResults(result) {
+                if (result['result'] != "stock quote could not be created") {
+                    // we have some kind of result. now to see if it has a latset price that we can use
+                    if (typeof result['result']['latestPrice'] != null) {
+                        // we have a valid latest price (probably)
+                        currentPrice = result['result']['latestPrice'].toFixed(2);
+                        $('#currentPrice').val("$" + currentPrice);
+                        if ($('#shares').val() != "") {
+                            estimatedTotal = (parseFloat(currentPrice) * parseFloat($("#shares").val())).toFixed(2);
+                            $('#estimatedTotal').val("$" + estimatedTotal);
+                        }
+                    }
+                } else {
+                    alert("Could not get the current price of the inputted ticker");
+                    $('#ticker').val("");
+                    $('#currentPrice').val("");
+                    $('#shares').val("");
+                    $('#estimatedTotal').val("");
+                    currentPrice = 0;
+                    shares = 0;
+                    estimatedTotal = 0;
+                }
+            }
+        });
+    </script>
+    <style>
+        footer {
+            font-size: 10pt;
+            text-align: center;
+            background-color: #2B6499;
+            color: white;
+        }
+        html, body{
+            height: 100%;
+        }
+        .table th {
+            border-top: none !important;
+        }
+    </style>
+    <title>Optimist</title>
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <% if (typeof userFirstName === "undefined"){ %>
+      <%-include('nav')-%>
+    <% } else{ %>
+      <%-include('navSignIn')-%>
+    <% } %>
+    <h2 class="pl-2 pt-2">Welcome!</h2>
+    
+    <div class="container h-100">
+        <div class="row align-items-center h-100">
+            <div class="col-6 mx-auto">
+                <div>
+                    <form class="form-inline" method="POST" action="/trade">
+                        <%if (errorMessage.length) {%>
+                            <div class="pb-2">
+                                <h3 class="text-danger" style="text-align: center;"><%=errorMessage%></h3>
+                            </div>
+                        <%}%>
+                        <div class="table-responsive mx-auto">
+                            <table class="table">
+                                <tr>
+                                    <th>Cash Balance:</th>
+                                </tr>
+                                <tr>
+                                    <td>Buying or Selling?</td>
+                                    <td>
+                                        <select class="form-control w-100" name="selectQuizOption" id="selectQuizOption">
+                                            <option value="Buying">Buying</option>
+                                            <option value="Selling">Selling</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Ticker</td>
+                                    <td><input type="text" class="form-control w-100" name="ticker" id="ticker" required></td>
+                                </tr>
+                                <tr>
+                                    <td>Current Price</td>
+                                    <td><input type="text" class="form-control w-100" name="currentPrice" id="currentPrice" readonly></td>
+                                </tr>
+                                <tr>
+                                    <td># of Shares</td>
+                                    <td><input type="number" class="form-control w-100" name="shares" id="shares" min="1" required></td>
+                                </tr>
+                                <tr>
+                                    <td>Estimated Total</td>
+                                    <td><input type="text" class="form-control w-100" name="estimatedTotal" id="estimatedTotal" readonly></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><button type="submit" class="btn btn-primary w-100" id="submitAddModule">Submit</button></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+    <%-include ('footer')-%>
+  </body>
+</html>

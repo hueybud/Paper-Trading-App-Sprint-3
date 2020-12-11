@@ -15,6 +15,9 @@ var loginHelpers = require('./helpers/loginHelpers');
 var portfolioHelpers = require('./helpers/portfolioHelpers');
 var searchHelpers = require('./helpers/searchHelpers');
 
+const { json } = require('body-parser');
+const { resolve } = require('path');
+
 app.set('view engine', 'ejs');
 app.use('/assets', express.static(__dirname + '/assets'));
 
@@ -49,6 +52,11 @@ app.get('/index', function (req, res) {
   }
 });
 
+app.post('/getStockQuote', async function(req, res){
+  var result = await stockAPIs.getStockQuoteNoEarnings(req.body.ticker);
+  res.send({result: result});
+})
+
 app.get('/getIndexes', async function(req, res){
   console.log(req.query.range);
   let indexResult = await stockAPIs.getIndexes(req.query.range);
@@ -76,6 +84,24 @@ app.get('/dashboard', async function(req, res){
     res.render('dashboard', {userFirstName: req.session.theUser.userFirstName, portfolioObj: dashboardComponents.portfolioObj, apiQuotes: dashboardComponents.apiQuotes, netValue: dashboardComponents.netValue, allDayGain: dashboardComponents.allDayGain, cash: dashboardComponents.portfolioObj.cash});
   }
 })
+
+app.get('/trade', async function(req, res){
+  res.render('trade', {errorMessage: ""});
+})
+
+app.get('/portfolio', async function(req, res){
+  if (!req.session.theUser) {
+    res.redirect('signin');
+    resolve("Please sign in first")
+  } else {
+    let portfolioTickers = await portfolioModel.getPortfolioTickers(req.session.theUser.portfolioID);
+    let apiQuotes = await stockAPIs.getPortfolioQuotes(portfolioTickers);
+    console.log(apiQuotes)
+    console.log(apiQuotes == "empty portfolio")
+      res.render('userStock', { search: apiQuotes, noResultsParam: '', queryParams: req.query, paginationString: '',  userFirstName: req.session.theUser.userFirstName});
+  }
+})
+
 
 app.get('/stockSearch', function (req, res) {
   if (req.session.theUser) {

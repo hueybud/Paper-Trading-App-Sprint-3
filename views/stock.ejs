@@ -70,7 +70,7 @@
                             //console.log(result[Object.keys(result)[i]]['chart'][k]['minute'])
                             var averagePrice = result[Object.keys(result)[i]]['chart'][k]['average'];
                             var percentChange = ((averagePrice - prevClose)/prevClose)*100;
-                            innerData.push(percentChange);
+                            innerData.push(averagePrice);
                         }
                         console.log(innerData);
                         data.push(innerData);
@@ -92,7 +92,7 @@
                         for (var j = 0; j < result[Object.keys(result)[i]]['chart'].length; j+=increment) {
                             var close= result[Object.keys(result)[i]]['chart'][j]['close'];
                             var percentChange = ((close - initialOpen)/initialOpen)*100;
-                            innerData.push(percentChange);
+                            innerData.push(close);
                             //innerData.push(result[Object.keys(result)[i]]['chart'][j]['changePercent'])
                         }
                         data.push(innerData);
@@ -107,7 +107,7 @@
                         for (var j = 0; j < result[Object.keys(result)[i]]['chart'].length; j+=10) {
                             var close= result[Object.keys(result)[i]]['chart'][j]['close'];
                             var percentChange = ((close - initialOpen)/initialOpen)*100;
-                            innerData.push(percentChange);
+                            innerData.push(close);
                             //innerData.push(result[Object.keys(result)[i]]['chart'][j]['changePercent'])
                         }
                         data.push(innerData);
