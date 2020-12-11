@@ -4,7 +4,7 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 var portfolioModelSchema = new mongoose.Schema({
     portfolioID: Number,
-    stocks: Array,
+    stocks : Array,
     principal: {type: Number, default: 100000},
     gain: {type: Number, default: 0},
     cash: {type: Number, default: 100000}

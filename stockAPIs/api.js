@@ -7,11 +7,7 @@ var api_key = fs.readFileSync(path.resolve(__dirname, "./iexAPI.txt"), "utf-8");
 function getPortfolioQuotes(portfolioTickers) {
     return new Promise(async function(resolve, reject){
         if (portfolioTickers.length != 0) {
-<<<<<<< HEAD
-            var apiResponse = await fetch('https://cloud.iexapis.com/v1/stock/market/batch?&types=quote&symbols=' + portfolioTickers.toString() + '&token=' + api_key);
-=======
             var apiResponse = await fetch('https://sandbox.iexapis.com/v1/stock/market/batch?&types=quote&symbols=' + portfolioTickers.toString() + '&token=' + api_key);
->>>>>>> 7ce4fa9e8a60b0060e89e51da98aee8b6eb997c7
             apiResponse.json().then(result => {
                 resolve(result);
             }).catch(err => {
@@ -60,6 +56,17 @@ function getYahooStockQuote(ticker) {
     })
 }
 
+function getYahooMultipleQuotes(tickers) {
+    return new Promise(async function(resolve, reject){
+        var allResult = [];
+        for (elem in tickers) {
+            var result = await getYahooStockQuote(tickers[elem]);
+            allResult.push(result);
+        }
+        resolve(allResult);
+    })
+}
+
 function getEarningsDate(ticker) {
     return new Promise(async function(resolve, reject){
         var apiResponse = await fetch('https://cloud.iexapis.com/stable/stock/' + ticker + '/upcoming-earnings?token=' + api_key);
@@ -102,3 +109,4 @@ module.exports.getStockQuote = getStockQuote;
 module.exports.getYahooStockQuote = getYahooStockQuote;
 module.exports.getEarningsDate = getEarningsDate;
 module.exports.getStockChart = getStockChart;
+module.exports.getYahooMultipleQuotes = getYahooMultipleQuotes;
