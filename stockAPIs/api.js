@@ -132,3 +132,4 @@ module.exports.getYahooStockQuote = getYahooStockQuote;
 module.exports.getEarningsDate = getEarningsDate;
 module.exports.getStockChart = getStockChart;
 module.exports.getStockQuoteNoEarnings = getStockQuoteNoEarnings;
+module.exports.getYahooMultipleQuotes = getYahooMultipleQuotes;

@@ -7,7 +7,6 @@ var session = require('express-session');
 app.use(session({ secret: 'ilovemet'}));
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-
 var portfolioModel = require('./models/PortfolioModel');
 var userModel = require('./models/UserModel');
 var stockAPIs = require('./stockAPIs/api');
@@ -71,6 +70,23 @@ app.get('/dbConnectionError', function (req, res) {
   }
 })
 
+app.get('/portfolio', async function(req, res){
+  if (!req.session.theUser) {
+    res.redirect('signin');
+    resolve("Please sign in first")
+  } else {
+
+    let portfolioObj = await portfolioModel.getPortfolio(req.session.theUser.portfolioID);
+    let portfolioTickers = await portfolioModel.getPortfolioTickers(req.session.theUser.portfolioID);
+    let apiQuotes = await stockAPIs.getPortfolioQuotes(portfolioTickers);
+    let dashboardComponents = await portfolioHelpers.calculatePortfolio(portfolioObj, apiQuotes);
+    let results = await stockAPIs.getYahooMultipleQuotes(portfolioTickers);
+    console.log(results);
+    res.render('portfolio', { stocksPrice:results,search: apiQuotes, cost:portfolioObj, allDayGain: dashboardComponents.allDayGain,portfolioObj:dashboardComponents.portfolioObj,totalGain: dashboardComponents.totalGainOnAllPositions, totalGainStock:dashboardComponents.totalGainArray, netValue:dashboardComponents.netValue,noResultsParam: '', queryParams: req.query, paginationString: '',  userFirstName: req.session.theUser.userFirstName});
+  }
+})
+
+
 app.get('/dashboard', async function(req, res){
   if (!req.session.theUser) {
     res.redirect('signin');
@@ -98,11 +114,13 @@ app.get('/portfolio', async function(req, res){
     res.redirect('signin');
     resolve("Please sign in first")
   } else {
+    let portfolioObj = await portfolioModel.getPortfolio(req.session.theUser.portfolioID);
     let portfolioTickers = await portfolioModel.getPortfolioTickers(req.session.theUser.portfolioID);
     let apiQuotes = await stockAPIs.getPortfolioQuotes(portfolioTickers);
-    console.log(apiQuotes)
-    console.log(apiQuotes == "empty portfolio")
-      res.render('userStock', { search: apiQuotes, noResultsParam: '', queryParams: req.query, paginationString: '',  userFirstName: req.session.theUser.userFirstName});
+    let dashboardComponents = await portfolioHelpers.calculatePortfolio(portfolioObj, apiQuotes);
+    let results = await stockAPIs.getYahooMultipleQuotes(portfolioTickers);
+    console.log(results);
+    res.render('portfolio', { stocksPrice:results,search: apiQuotes, cost:portfolioObj, allDayGain: dashboardComponents.allDayGain,portfolioObj:dashboardComponents.portfolioObj,totalGain: dashboardComponents.totalGainOnAllPositions, totalGainStock:dashboardComponents.totalGainArray, netValue:dashboardComponents.netValue,noResultsParam: '', queryParams: req.query, paginationString: '',  userFirstName: req.session.theUser.userFirstName});
   }
 })
 
@@ -151,7 +169,6 @@ app.get('/getStockChart', async function(req, res){
 })
 
 // SIGN IN AND REGISTER PATHS
-
 
 async function signIn(req) {
   return new Promise(async function(resolve, reject){
