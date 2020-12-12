@@ -33,7 +33,7 @@
             function formatGetStockQuoteResults(result) {
                 if (result['result'] != "stock quote could not be created") {
                     // we have some kind of result. now to see if it has a latset price that we can use
-                    if (typeof result['result']['latestPrice'] != null) {
+                    if (result['result']['latestPrice'] != null) {
                         // we have a valid latest price (probably)
                         currentPrice = result['result']['latestPrice'].toFixed(2);
                         $('#currentPrice').val("$" + currentPrice);
@@ -97,7 +97,7 @@
                                 <tr>
                                     <td>Buying or Selling?</td>
                                     <td>
-                                        <select class="form-control w-100" name="selectQuizOption" id="selectQuizOption">
+                                        <select class="form-control w-100" name="tradeOption" id="tradeOption">
                                             <option value="Buying">Buying</option>
                                             <option value="Selling">Selling</option>
                                         </select>

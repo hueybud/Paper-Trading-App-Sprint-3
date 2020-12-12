@@ -89,6 +89,10 @@ app.get('/trade', async function(req, res){
   res.render('trade', {errorMessage: ""});
 })
 
+app.post('/trade', async function(req, res){
+
+})
+
 app.get('/portfolio', async function(req, res){
   if (!req.session.theUser) {
     res.redirect('signin');
