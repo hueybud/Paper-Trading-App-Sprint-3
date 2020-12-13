@@ -105,8 +105,9 @@ function getEarningsDate(ticker) {
 // async function test() {
 //     var portfolioResult = await portfolioModel.getPortfolioTickers(1);
 //     console.log(portfolioResult);
-//     var result = await getYahooMultipleQuotes(portfolioResult);
+//     var result = await getYahooMultipleQuotes(["DINASOUR"]);
 //     console.log(result);
+//     console.log(result[0] == undefined);
 //     // var allResult = [];
 //     // for (elem in portfolioResult) {
 //     //     var result = await getYahooStockQuote(portfolioResult[elem]);
