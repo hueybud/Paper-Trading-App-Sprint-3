@@ -20,14 +20,6 @@ function validator(req) {
         } else {
             resolve(["valid", stockResult]);
         }
-        if (req.body.tradeOption == "Buying") {
-            // get the real total price
-            // get the user's cash
-            // compare
-        }
-        if (req.body.tradeOption == "Selling") {
-
-        }
     })
 }
 
@@ -36,6 +28,7 @@ function tradeStock(req) {
         var validatorResult = await validator(req);
         if (validatorResult[0] == "invalid") {
             // invalid
+            resolve(validatorResult);
         } else {
             var portfolioObj = await portfolioModel.getPortfolio(req.session.theUser.portfolioID);
             var latestPrice = validatorResult[1]['latestPrice'];
@@ -44,6 +37,7 @@ function tradeStock(req) {
             if (req.body.tradeOption == "Buying") {
                 if (portfolioObj.cash < totalCost) {
                     // invalid
+                    resolve(["invalid", "Total cost of purchased stock must not exceed cash balance"]);
                 } else {
                     // call buy stock with needed parameters
                     var buyResult = await buyStock(req.session.theUser.portfolioID, req.body.ticker.toUpperCase(), latestPrice, shares, totalCost);
@@ -56,6 +50,7 @@ function tradeStock(req) {
                     // we have the stock in our portfolio
                     if (shares > stockInPortfolio.purchaseQuantity) {
                         // invalid
+                        resolve(["invalid", "You cannot sell more shares than you own"]);
                     } else {
                         // call sell stock with needed parameters
                         // resolve result
@@ -63,6 +58,7 @@ function tradeStock(req) {
                         resolve(sellResult);
                     }
                 } else {
+                    resolve(["invalid", "There are no shares of the inputted stock in your portfolio to sell"]);
                     // invalid
                 }
             }
@@ -96,12 +92,14 @@ function buyStock(portfolioID, ticker, latestPrice, shares, totalCost) {
                 var cash = parseFloat(portfolioObj.cash - totalCost);
                 portfolioModel.Portfolio.updateOne({"portfolioID": portfolioID}, {$set: {"cash": cash}})
                 .then(result1 => {
-                    resolve("updated stock in the portfolio");
+                    console.log("updated stock in the portfolio");
+                    resolve(["valid", "Purchased " + shares + " shares of " + ticker + " at $" + latestPrice + "for a total cost of $" + totalCost]);
                 })
             })
             .catch(err => {
                 console.log(err);
-                resolve("error adding non new stock the portfolio");
+                console.log("error adding non new stock the portfolio");
+                resolve(["invalid", "Error purchasing stock"])
             })
         } else {
             // we need to add this new stock to our portfolio
@@ -117,12 +115,14 @@ function buyStock(portfolioID, ticker, latestPrice, shares, totalCost) {
                 var cash = parseFloat((portfolioObj.cash - totalCost));
                 portfolioModel.Portfolio.updateOne({"portfolioID": portfolioID}, {$set: {"cash": cash}})
                 .then(result1 => {
-                    resolve("updated stock in the portfolio");
+                    console.log("added stock to the portfolio");
+                    resolve(["valid", "Purchased " + shares + " shares of " + ticker + " at $" + latestPrice + "for a total cost of $" + totalCost]);
                 })
             })
             .catch(err => {
                 console.log(err);
-                resolve("error adding new stock to the portfolio");
+                console.log("error adding new stock to the portfolio")
+                resolve(["invalid", "Error purchasing stock"]);
             })
         }
     });
@@ -153,16 +153,19 @@ function sellStock(portfolioID, ticker, latestPrice, shares, totalCost) {
                 .then(result => {
                     portfolioModel.Portfolio.updateOne({"portfolioID": portfolioID}, {$set: {"cash": updatedCash, "gain": totalGain}})
                     .then(result1 =>{
-                        resolve("sold some stock");
+                        console.log("sold some stock")
+                        resolve(["valid", "Sold " + shares + " of " + ticker + " at $" + latestPrice + " for a total sale of $" + revOnStock + " and total gain of $" + totalGain.toFixed(2)]);
                     })
                     .catch(err =>{
                         console.log(err);
-                        resolve("error updating portfolio after selling some stock")
+                        console.log("error updating portfolio after selling some stock")
+                        resolve(["invalid", "Error selling stock"]);
                     })
                 })
                 .catch(err => {
                     console.log(err);
-                    resolve("error selling some of the stock");
+                    console.log("error selling some of the stock");
+                    resolve(["invalid", "Error selling stock"]);
                 }) 
             } else {
                 // we just sold all of our remaining shares of this stock
@@ -170,22 +173,28 @@ function sellStock(portfolioID, ticker, latestPrice, shares, totalCost) {
                 .then(result => {
                     portfolioModel.Portfolio.updateOne({"portfolioID": portfolioID}, {$set: {"cash": updatedCash, "gain": totalGain}})
                     .then(result1 =>{
-                        resolve("sold all stock");
+                        console.log("sold all stock")
+                        resolve(["valid", "Sold " + shares + " of " + ticker + " at $" + latestPrice + " for a total sale of $" + revOnStock + " and total gain of $" + totalGain.toFixed(2)]);
                     })
                     .catch(err =>{
                         console.log(err);
-                        resolve("error updating portfolio after selling allstock")
+                        console.log("error updating portfolio after selling allstock");
+                        resolve(["invalid", "Error selling stock"]);
                     })
                 })
                 .catch(err => {
                     console.log(err);
-                    resolve("error selling all of the stock");
+                    console.log("error selling all of the stock");
+                    resolve(["invalid", "Error selling stock"]);
                 }) 
             }
         } else {
-            resolve("stock is not in the portfolio");
+            resolve(["invalid", "Inputted stock is not in the portfolio"]);
         }
     })
 }
 
 module.exports.tradeStock = tradeStock;
+module.exports.validator = validator;
+module.exports.buyStock = buyStock;
+module.exports.sellStock = sellStock;
