@@ -16,7 +16,7 @@ function calculatePortfolio(portfolioObj, apiQuotes) {
           console.log("total gain so far:" + totalGainOnAllPositions);
         }
         netValue += parseFloat(totalGainOnAllPositions);
-        resolve({portfolioObj: portfolioObj, apiQuotes: apiQuotes, netValue: netValue.toFixed(2), allDayGain: allDayGain.toFixed(2), totalGainArray: totalGainArray});
+        resolve({portfolioObj: portfolioObj, apiQuotes: apiQuotes, netValue: netValue.toFixed(2), allDayGain: allDayGain.toFixed(2), totalGainArray: totalGainArray,totalGainOnAllPositions:totalGainOnAllPositions});
     })
 }
 

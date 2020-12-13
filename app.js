@@ -13,9 +13,8 @@ var stockAPIs = require('./stockAPIs/api');
 var loginHelpers = require('./helpers/loginHelpers');
 var portfolioHelpers = require('./helpers/portfolioHelpers');
 var searchHelpers = require('./helpers/searchHelpers');
+var tradeHelpers = require('./helpers/tradeHelper');
 
-const { json } = require('body-parser');
-const { resolve } = require('path');
 
 app.set('view engine', 'ejs');
 app.use('/assets', express.static(__dirname + '/assets'));
@@ -102,11 +101,18 @@ app.get('/dashboard', async function(req, res){
 })
 
 app.get('/trade', async function(req, res){
-  res.render('trade', {errorMessage: ""});
+  if (req.session.theUser) {
+    let portfolioObj = await portfolioModel.getPortfolio(req.session.theUser.portfolioID);
+    res.render('trade', {errorMessage: "", userFirstName: req.session.theUser.userFirstName, cashBalance: portfolioObj.cash});
+  } else {
+    res.render('trade', {errorMessage: ""});
+  }
 })
 
 app.post('/trade', async function(req, res){
-
+  var result = await tradeHelpers.tradeStock(req);
+  console.log(result);
+  res.end();
 })
 
 app.get('/portfolio', async function(req, res){

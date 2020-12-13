@@ -92,7 +92,11 @@
                         <div class="table-responsive mx-auto">
                             <table class="table">
                                 <tr>
-                                    <th>Cash Balance:</th>
+                                    <% if (typeof userFirstName === "undefined"){ %>
+                                        <th>Cash Balance:</th>
+                                      <% } else{ %>
+                                        <th>Cash Balance: $<%=cashBalance.toLocaleString('en-US', {minimumFractionDigits:2})%></th>
+                                      <% } %>
                                 </tr>
                                 <tr>
                                     <td>Buying or Selling?</td>

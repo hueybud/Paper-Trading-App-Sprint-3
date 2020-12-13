@@ -64,5 +64,6 @@ module.exports.getPortfolio = getPortfolio;
 module.exports.getPortfolioTickers = getPortfolioTickers;
 module.exports.addPortfolio = addPortfolio;
 module.exports.removePortfolio = removePortfolio;
+module.exports.Portfolio = Portfolio;
 
 

@@ -16,7 +16,7 @@
       });
     </script>
     <style>
-        .table tbody tr:first-child {
+        .portfolio-table tbody tr:first-child {
           background-color: rgba(0,0,0,.05);
         }
         footer {
@@ -31,23 +31,12 @@
             height: 100% !important;
           } 
         }
-        h2{
-          color: blue;
-          line-height: 2em;
 
+        #tradeMessage {
+          text-decoration: underline;
         }
-        h6#NA{
-          color: red;
-        }
-
-        
-        h3{
-          line-height: 2em;
-        }
-
-       
     </style>
-    <title>Your Stocks</title>
+    <title>Portfolio</title>
   </head>
   <body class="d-flex flex-column min-vh-100">
     <% if (typeof userFirstName === "undefined"){ %>
@@ -56,162 +45,180 @@
       <%-include('navSignIn')-%>
     <% } %>
 
-    <form method="GET" action="/portfolio" class="pl-2">
-
-      <div class="table-responsive">
-        <h3>Portfolio</h3>
-  
-        <table class="table table-striped table-bordered">
-          
-              <tr>
-                  <th>Net Account Value</th>
-                  <td>$<%=parseFloat(netValue).toLocaleString('en-US', {minimumFractionDigits:2})%></td>
-              </tr>
-              <tr>
-                  <th>Day's Gain</th>
-                  <% if (allDayGain < 0) {%>
-                      <td class="text-danger">$<%=parseFloat(allDayGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((allDayGain/netValue) * 100).toFixed(2)%>%)</td>
-                  <%} else {%>
-                      <td class="text-success">$<%=parseFloat(allDayGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((allDayGain/netValue) * 100).toFixed(2)%>%)</td>
-                  <%}%>
-              </tr>   
-              <tr>
-                <th>Totals's Gain</th>
-                <% if (totalGain < 0) {%>
-                    <td class="text-danger">$<%=parseFloat(totalGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((totalGain/netValue) * 100).toFixed(2)%>%)</td>
-                <%} else {%>
-                    <td class="text-success">$<%=parseFloat(totalGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((totalGain/netValue) * 100).toFixed(2)%>%)</td>
-                <%}%>
-            </tr> 
-              <tr>
-                  <th>Cash Purchasing Power</th>
-                  <td>$<%=parseFloat(cost['cash']).toLocaleString('en-US', {minimumFractionDigits:2})%></td>
-              </tr>                   
-        </table>
-    </div>
-  
-    <div class="table-responsive ">
-      <table class="table table-bordered">
-    
-        <% if(search == "empty portfolio"){ %>
-          <h2>You do not have any stock in your portfolio !!</h2>
-        <% } else{ %>  
-          <tr>
-            <th>Stock Ticker</th><th>Company Name</th><th>High</th><th>Low</th><th>Latest Price</th>
-            <th>Change</th><th>Change Percent</th><th>Day Gain</th><th>Total Gain</th>
-            <th>52 Week High</th><th>52 Week Low</th><th>Cost Basis</th>
-          </tr>
-  
-      <% for (var i=0; i < Object.keys(search).length; i++) {%>
-        <tr>
-            <td><a href='/stock?ticker=<%=Object.keys(search)[i]%>'><%=Object.keys(search)[i]%></a></td>
-            
-            <% if(search[Object.keys(search)[i]]['quote']['companyName'] != null){ %>
-              <td><h6><%=search[Object.keys(search)[i]]['quote']['companyName']%></h6></td>
-              <% } else{ %>  
-                <td><h6 id="NA">N/A</h6></td>
-      
-                 <% } %>
-
-
-                 <% if(stocksPrice[i]['summaryDetail']['dayHigh'] != null){ %>
-                  <td><h6><%="$" +stocksPrice[i]['summaryDetail']['dayHigh'].toFixed(2)%></h6></td>
-                  <% } else{ %>  
-                    <td><h6 id="NA">N/A</h6></td>
-          
-                     <% } %>
-                 
-
-                     <% if(stocksPrice[i]['summaryDetail']['dayLow'] != null){ %>
-                      <td><h6><%="$" + stocksPrice[i]['summaryDetail']['dayLow'].toFixed(2)%></h6></td>
-                      <% } else{ %>  
-                        <td><h6 id="NA">N/A</h6></td>
-              
-                         <% } %>
-
-
-                     <% if(search[Object.keys(search)[i]]['quote']['latestPrice'] != null){ %>
-                      <td><h6><%="$" +search[Object.keys(search)[i]]['quote']['latestPrice'].toFixed(2)%></h6></td>
-                      <% } else{ %>  
-                        <td><h6 id="NA">N/A</h6></td>
-              
-                         <% } %>
-
-
-                      
-
-                             <% if(search[Object.keys(search)[i]]['quote']['change'] != null){ %>
-                              <td><h6><%="$" + search[Object.keys(search)[i]]['quote']['change'].toFixed(2)%></h6></td>
+    <form method="GET" action="/portfolio">
+      <div class="container-fluid">
+        <div class="row pt-3">
+            <div class="col-lg">
+                <div class="row">
+                    <div class="col-lg-4">
+                      <h3 class="pt-2 pl-2">Portfolio</h3>
+                      <div class="table-responsive">
+                        <table class="table">
+                              <tr>
+                                  <th>Net Account Value</th>
+                                  <td>$<%=parseFloat(netValue).toLocaleString('en-US', {minimumFractionDigits:2})%></td>
+                              </tr>
+                              <tr>
+                                  <th>Day's Gain</th>
+                                  <% if (allDayGain < 0) {%>
+                                      <td class="text-danger">$<%=parseFloat(allDayGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((allDayGain/netValue) * 100).toFixed(2)%>%)</td>
+                                  <%} else {%>
+                                      <td class="text-success">$<%=parseFloat(allDayGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((allDayGain/netValue) * 100).toFixed(2)%>%)</td>
+                                  <%}%>
+                              </tr>   
+                              <tr>
+                                <th>Total Unrealized Gain</th>
+                                <% if (totalGain < 0) {%>
+                                    <td class="text-danger">$<%=parseFloat(totalGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((totalGain/portfolioObj.principal) * 100).toFixed(2)%>%)</td>
+                                <%} else {%>
+                                    <td class="text-success">$<%=parseFloat(totalGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((totalGain/portfolioObj.principal) * 100).toFixed(2)%>%)</td>
+                                <%}%>
+                              </tr>
+                              <tr>
+                                <th>Total Realized Gain</th>
+                                <% if (portfolioObj.gain< 0) {%>
+                                    <td class="text-danger">$<%=parseFloat(portfolioObj.gain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((portfolioObj.gain/portfolioObj.principal) * 100).toFixed(2)%>%)</td>
+                                <%} else if (portfolioObj.gain > 0) {%>
+                                    <td class="text-success">$<%=parseFloat(portfolioObj.gain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((portfolioObj.gain/portfolioObj.principal) * 100).toFixed(2)%>%)</td>
+                                <%} else { %>
+                                  <td class="text-primary">$<%=parseFloat(portfolioObj.gain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((portfolioObj.gain/portfolioObj.principal) * 100).toFixed(2)%>%)</td>
+                                <%} %>
+                              </tr>  
+                              <tr>
+                                  <th>Cash Purchasing Power</th>
+                                  <td>$<%=parseFloat(cost['cash']).toLocaleString('en-US', {minimumFractionDigits:2})%></td>
+                              </tr>                   
+                        </table>
+                      </div>
+                    </div>
+                    <div class="col-lg">
+                      <button type="button" class="btn btn-danger mt-2 pr-2" style="float: right">Reset Portfolio</button>
+                    </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg">
+                    <div class="table-responsive">
+                      <table class="table portfolio-table">
+                    
+                        <% if(search == "empty portfolio"){ %>
+                          <h3 class="text-danger pb-2">You do not have any stocks in your portfolio</h3>
+                          <h3 class="text-primary"><a href="/trade" id="tradeMessage">Buy stocks here</a></h3>
+                        <% } else{ %>  
+                          <tr>
+                            <th>Ticker</th><th>Company Name</th><th>Change %</th><th>Latest Price</th><th>Change $</th><th>Day Gain</th><th>Total Gain</th>
+                            <th>Cost Basis</th><th>Quantity</th><th>Purchase Value</th><th>Market Value</th>
+                            <th>Day Range</th>
+                            <th>52 Week Range</th>
+                          </tr>
+                  
+                      <% for (var i=0; i < Object.keys(search).length; i++) {%>
+                        <tr>
+                            <td><a href='/stock?ticker=<%=Object.keys(search)[i]%>'><%=Object.keys(search)[i]%></a></td>
+                            
+                            <% if(search[Object.keys(search)[i]]['quote']['companyName'] != null){ %>
+                              <td><h6><%=search[Object.keys(search)[i]]['quote']['companyName']%></h6></td>
                               <% } else{ %>  
-                                <td><h6 id="NA">N/A</h6></td>
+                                <td class="text-warning">N/A</td>
                       
                                  <% } %>
 
                                  <% if(search[Object.keys(search)[i]]['quote']['changePercent'] != null){ %>
-                                  <td><h6><%=parseFloat(search[Object.keys(search)[i]]['quote']['changePercent']*100).toFixed(2) + "%" %></h6></td>
+                                  <% if (search[Object.keys(search)[i]]['quote']['changePercent'] > 0) {%>
+                                    <td class="text-success"><%=parseFloat(search[Object.keys(search)[i]]['quote']['changePercent']*100).toFixed(2) + "%" %></td>
+                                  <%} else {%>
+                                    <td class="text-danger"><%=parseFloat(search[Object.keys(search)[i]]['quote']['changePercent']*100).toFixed(2) + "%" %></td>
+                                  <%}%>
                                   <% } else{ %>  
-                                    <td><h6 id="NA">N/A</h6></td>
+                                    <td class="text-warning">N/A</td>
                           
                                      <% } %>
 
-                                     <% if(portfolioObj.stocks[i].dayGain != null){ %>
-                                      <td><h6><%="$" + portfolioObj.stocks[i].dayGain%></h6></td>
+                                     <% if(search[Object.keys(search)[i]]['quote']['latestPrice'] != null){ %>
+                                      <td><%="$" +search[Object.keys(search)[i]]['quote']['latestPrice'].toFixed(2)%></td>
                                       <% } else{ %>  
-                                        <td><h6 id="NA">N/A</h6></td>
+                                        <td class="text-warning">N/A</td>
                               
                                          <% } %>
-                                         <% if(totalGainStock != null){ %>
-                                          <td><h6><%="$" + totalGainStock[i]%></h6></td>
+
+                            <% if(search[Object.keys(search)[i]]['quote']['change'] != null){ %>
+                              <% if(search[Object.keys(search)[i]]['quote']['change'] > 0) {%>
+                                <td class="text-success"><%="$" + search[Object.keys(search)[i]]['quote']['change'].toFixed(2)%></td>
+                              <%} else {%>
+                                <td class="text-danger"><%="$" + search[Object.keys(search)[i]]['quote']['change'].toFixed(2)%></td>
+                              <%}%>
+                            <% } else{ %>  
+                              <td class="text-warning">N/A</td>
+                    
+                                <% } %>
+
+                                <% if(portfolioObj.stocks[i].dayGain != null){ %>
+                                  <%if (portfolioObj.stocks[i].dayGain > 0) {%>
+                                    <td class="text-success"><%="$" + (portfolioObj.stocks[i].dayGain).toLocaleString('en-US', {minimumFractionDigits:2})%></td>
+                                  <%} else {%>
+                                    <td class="text-danger"><%="$" + (portfolioObj.stocks[i].dayGain).toLocaleString('en-US', {minimumFractionDigits:2})%></td>
+                                  <%}%>
+                                  <% } else{ %>  
+                                    <td class="text-warning">N/A</td>
+                          
+                                     <% } %>
+
+                                     <% if(totalGainStock[i] != null){ %>
+                                      <% if (totalGainStock[i] > 0) {%>
+                                        <td class="text-success"><%="$" + totalGainStock[i].toLocaleString('en-US', {minimumFractionDigits:2})%></td>
+                                      <%} else {%>
+                                        <td class="text-danger"><%="$" + totalGainStock[i].toLocaleString('en-US', {minimumFractionDigits:2})%></td>
+                                      <%}%>
+                                      <% } else{ %>  
+                                        <td class="text-warning">N/A</td>
+                              
+                                         <% } %>
+
+                                         <% if(cost['stocks'][i]['purchasePrice'] != null){ %>
+                                          <td><%="$" + cost['stocks'][i]['purchasePrice']  %></td>
                                           <% } else{ %>  
-                                            <td><h6 id="NA">N/A</h6></td>
+                                            <td class="text-warning">N/A</td>
                                   
                                              <% } %>
 
-                                             <% if(search[Object.keys(search)[i]]['quote']['week52High'] != null){ %>
-                                              <td><h6><%="$" + search[Object.keys(search)[i]]['quote']['week52High'].toFixed(2)%></h6></td>
+                                            <td><%=cost['stocks'][i]['purchaseQuantity']%></td>
+                                            <td>$<%=cost['stocks'][i]['purchaseValue'].toFixed(2)%></td>
+                                            <% if(search[Object.keys(search)[i]]['quote']['latestPrice'] != null){ %>
+                                              <td>$<%=(search[Object.keys(search)[i]]['quote']['latestPrice'] * cost['stocks'][i]['purchaseQuantity']).toFixed(2)%></td>
                                               <% } else{ %>  
-                                                <td><h6 id="NA">N/A</h6></td>
+                                                <td class="text-warning">N/A</td>
                                       
                                                  <% } %>
-
-
-                                             <% if(search[Object.keys(search)[i]]['quote']['week52Low'] != null){ %>
-                                              <td><h6><%="$" + search[Object.keys(search)[i]]['quote']['week52Low'].toFixed(2)%></h6></td>
-                                              <% } else{ %>  
-                                                <td><h6 id="NA">N/A</h6></td>
-                                      
-                                                 <% } %>
-                                                 
-                                                 <% if(cost['stocks'][i]['purchasePrice'] != null){ %>
-                                                  <td><h6><%="$" + cost['stocks'][i]['purchasePrice']  %></h6></td>
-                                                  <% } else{ %>  
-                                                    <td><h6 id="NA">N/A</h6></td>
-                                          
-                                                     <% } %>
-
-        </tr> 
-      <%}%>       <% } %>
-
-
-
-   
-        
-
-       
-        
-
-      
-
-
-
-
-
-      </table>
-      <h3 class="pl-2 text-danger"><%=noResultsParam%></h3>
-      <div class="float-right pr-2">
-        <%-paginationString-%>
+                
+                
+                                 <% if(stocksPrice[i]['summaryDetail']['dayHigh'] != null && stocksPrice[i]['summaryDetail']['dayLow'] != null){ %>
+                                  <td><%="$" + stocksPrice[i]['summaryDetail']['dayLow'].toFixed(2)%> - <%="$" +stocksPrice[i]['summaryDetail']['dayHigh'].toFixed(2)%></td>
+                                  <% } else{ %>  
+                                    <td class="text-warning">N/A</td>
+                          
+                                     <% } %>
+                                 
+                
+              
+                
+                                                             <% if(search[Object.keys(search)[i]]['quote']['week52High'] != null && search[Object.keys(search)[i]]['quote']['week52Low'] != null){ %>
+                                                              <td><%="$" + search[Object.keys(search)[i]]['quote']['week52Low'].toFixed(2)%> - <%="$" + search[Object.keys(search)[i]]['quote']['week52High'].toFixed(2)%></td>
+                                                              <% } else{ %>  
+                                                                <td class="text-warning">N/A</td>
+                                                      
+                                                                 <% } %>
+                        </tr> 
+                      <%}%>       <% } %>
+                      </table>
+                      <h3 class="pl-2 text-danger"><%=noResultsParam%></h3>
+                      <div class="float-right pr-2">
+                        <%-paginationString-%>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
       </div>
-    </div>
     </form>
     <%-include ('footer')-%>
   </body>
