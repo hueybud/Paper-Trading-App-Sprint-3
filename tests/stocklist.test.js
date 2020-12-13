@@ -25,15 +25,20 @@ test('getting the user that does not have any ticker', async function(){
 
 // //Testing the getYahooFunction
 test('Testing getMultipleYahooQuotes for some tickers that we know exsist', async function() {
-    let results = await api.getYahooMultipleQuotes("AAPL, TSLA");
-    expect( typeof results).toBe("object");
-    expect(results.length).not.toBe(0);
+    let results = await api.getYahooMultipleQuotes(['AAPL', 'TSLA']);
+    expect(results.length).toBe(2);
+    expect(typeof results[0]).toBe("object");
+    expect(typeof results[1]).toBe("object");
+    expect(results[0]).not.toEqual(undefined);
+    expect(results[1]).not.toEqual(undefined);
+
 
 })
 
 // //Testing the getYahooFunction
 test('Testing getMultipleYahooQuotes for a stock that we know does not exist', async function() {
-    let results = await api.getYahooMultipleQuotes("Dina");
-    expect( results.length).toBe(0);
+    let results = await api.getYahooMultipleQuotes(['Dinasour']);
+    expect(results.length).toBe(1);
+    expect(results[0]).toEqual(undefined);
 
 })
