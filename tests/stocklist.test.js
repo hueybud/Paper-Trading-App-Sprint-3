@@ -24,22 +24,16 @@ test('getting the user that does not have any ticker', async function(){
 })
 
 // //Testing the getYahooFunction
-test('Testing getMultipleYahooQuotes for a user that we know has some stocks in the portfolio', async function() {
-    var result = await userModel.getUserByUsername('Bhuitt1');
-    let portfolioObj = await portfolioModel.getPortfolio(result.portfolioID);
-    let portfolioTickers = await portfolioModel.getPortfolioTickers(result.portfolioID);
-    let results = await api.getYahooMultipleQuotes(portfolioTickers);
+test('Testing getMultipleYahooQuotes for some tickers that we know exsist', async function() {
+    let results = await api.getYahooMultipleQuotes("AAPL, TSLA");
     expect( typeof results).toBe("object");
     expect(results.length).not.toBe(0);
 
 })
 
 // //Testing the getYahooFunction
-test('Testing getMultipleYahooQuotes for a user that we know does not have some stocks in the portfolio', async function() {
-    var result = await userModel.getUserByUsername('Ssabeti1');
-    let portfolioObj = await portfolioModel.getPortfolio(result.portfolioID);
-    let portfolioTickers = await portfolioModel.getPortfolioTickers(result.portfolioID);
-    let results = await api.getYahooMultipleQuotes(portfolioTickers);
+test('Testing getMultipleYahooQuotes for a stock that we know does not exist', async function() {
+    let results = await api.getYahooMultipleQuotes("Dina");
     expect( results.length).toBe(0);
 
 })
