@@ -61,6 +61,15 @@ app.get('/getIndexes', async function(req, res){
   res.json(indexResult);
 })
 
+app.post('/resetPortfolio', async function(req, res){
+  if (req.session.theUser) {
+    var result = await portfolioModel.resetPortfolio(req.session.theUser.portfolioID);
+    res.send({result: result})
+  } else {
+    res.send({result: "Not signed in"})
+  }
+})
+
 app.get('/dbConnectionError', function (req, res) {
   if (req.session.theUser) {
     res.render('dbConnectionError', { userFirstName: req.session.theUser.userFirstName});
@@ -103,16 +112,17 @@ app.get('/dashboard', async function(req, res){
 app.get('/trade', async function(req, res){
   if (req.session.theUser) {
     let portfolioObj = await portfolioModel.getPortfolio(req.session.theUser.portfolioID);
-    res.render('trade', {errorMessage: "", userFirstName: req.session.theUser.userFirstName, cashBalance: portfolioObj.cash});
+    res.render('trade', {result: "empty", errorMessage: "", userFirstName: req.session.theUser.userFirstName, cashBalance: portfolioObj.cash});
   } else {
-    res.render('trade', {errorMessage: ""});
+    res.redirect('signin');
   }
 })
 
 app.post('/trade', async function(req, res){
   var result = await tradeHelpers.tradeStock(req);
   console.log(result);
-  res.end();
+  let portfolioObj = await portfolioModel.getPortfolio(req.session.theUser.portfolioID);
+  res.render('trade', {result: result, errorMessage: "", userFirstName: req.session.theUser.userFirstName, cashBalance: portfolioObj.cash});
 })
 
 app.get('/portfolio', async function(req, res){

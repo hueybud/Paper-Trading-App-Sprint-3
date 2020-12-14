@@ -60,10 +60,27 @@ function removePortfolio(portfolioID) {
     })
 }
 
+function resetPortfolio(portfolioID) {
+    return new Promise(function(resolve, reject){
+        Portfolio.updateOne({portfolioID: portfolioID}, {$set: {stocks: []}})
+        .then(result => {
+            Portfolio.updateOne({portfolioID: portfolioID}, {$set: {principal: 100000, gain: 0, cash: 100000}})
+            .then(result1 => {
+                resolve([result, result1]);
+            })
+        })
+        .catch(err => {
+            console.log(err);
+            resolve("could not reset portfolio");
+        })
+    })
+}
+
 module.exports.getPortfolio = getPortfolio;
 module.exports.getPortfolioTickers = getPortfolioTickers;
 module.exports.addPortfolio = addPortfolio;
 module.exports.removePortfolio = removePortfolio;
+module.exports.resetPortfolio = resetPortfolio;
 module.exports.Portfolio = Portfolio;
 
 

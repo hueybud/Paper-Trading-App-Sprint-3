@@ -5,6 +5,16 @@
     <script>
         $(document).ready(() => {
             //start up scripts
+            var postResult = "<%=(result)%>";
+            console.log(postResult);
+            console.log(postResult == "empty");
+            if (postResult != "empty") {
+                postResult = '<%- JSON.stringify(result) -%>';
+                var postResult = JSON.parse(postResult);
+                console.log(postResult);
+                formatOrderResult(postResult);
+                
+            }
             var currentPrice = 0;
             var shares = 0;
             var estimatedTotal = 0;
@@ -53,6 +63,23 @@
                     estimatedTotal = 0;
                 }
             }
+
+            function formatOrderResult(result) {
+                if (result[0] == "valid") {
+                    $('#modalTitle').addClass('text-success')
+                    $('#modalTitle').text("Success") 
+                } else {
+                    $('#modalTitle').addClass('text-danger')
+                    $('#modalTitle').text("Error")
+                }
+                $("#modalBody").text(result[1]);
+                $("#myModal").modal('show');
+            }
+
+            $('#myModal').on('hidden.bs.modal', function(){
+                $('#modalTitle').removeClass('text-success');
+                $('#modalTitle').removeClass('text-danger');
+            })
         });
     </script>
     <style>
@@ -92,7 +119,7 @@
                         <div class="table-responsive mx-auto">
                             <table class="table">
                                 <tr>
-                                    <% if (typeof userFirstName === "undefined"){ %>
+                                    <% if (typeof cashBalance === "undefined"){ %>
                                         <th>Cash Balance:</th>
                                       <% } else{ %>
                                         <th>Cash Balance: $<%=cashBalance.toLocaleString('en-US', {minimumFractionDigits:2})%></th>
@@ -130,6 +157,24 @@
                         </div>
                     </form>
                 </div>
+                <div class="modal fade" role="dialog" id="myModal">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="modalTitle">Modal title</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <p id="modalBody">Modal body text goes here.</p>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
             </div>
         </div>
     </div>

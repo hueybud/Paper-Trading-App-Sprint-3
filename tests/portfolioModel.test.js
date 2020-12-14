@@ -1,4 +1,5 @@
 var portfolioModel = require('../models/PortfolioModel');
+var orderHelpers = require('../helpers/orderHelpers');
 
 async function setup() {
     await portfolioModel.removePortfolio(300);
@@ -66,4 +67,29 @@ test('remove a portfolio that does not exist yet', async function(){
 test('remove a portfolio that does exist', async function(){
     var result = await portfolioModel.removePortfolio(300)
     expect(result.deletedCount).toBe(1);
+})
+
+/*
+    Testing the resetPortfolio() function
+*/
+
+test('reset a portfolio that does not exist yet', async function(){
+    var result = await portfolioModel.resetPortfolio(301)
+    expect(result.length).toBe(2);
+    expect(result[0].nModified).toBe(0);
+    expect(result[1].nModified).toBe(0);
+})
+
+test('reset a portfolio that does exist', async function(){
+    await portfolioModel.addPortfolio(300);
+    await orderHelpers.buyStock(300, 'AAPL', 110, 10, 1100);
+    var result = await portfolioModel.resetPortfolio(300)
+    expect(result.length).toBe(2);
+    expect(result[0].nModified).toBe(1);
+    expect(result[1].nModified).toBe(1);
+    result = await portfolioModel.getPortfolio(300);
+    expect(result.principal).toBe(100000);
+    expect(typeof result.stocks[0]).toBe("undefined");
+    expect(result.gain).toBe(0);
+    expect(result.cash).toBe(100000);
 })
