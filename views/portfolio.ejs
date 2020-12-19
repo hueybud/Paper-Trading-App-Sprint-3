@@ -69,10 +69,18 @@
                               </tr>
                               <tr>
                                   <th>Day's Gain</th>
-                                  <% if (allDayGain < 0) {%>
-                                      <td class="text-danger">$<%=parseFloat(allDayGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((allDayGain/netValue) * 100).toFixed(2)%>%)</td>
+                                  <% if (portfolioObj.purchaseDate == new Date().toLocaleDateString()) {%>
+                                      <% if (totalGain < 0) {%>
+                                        <td class="text-danger">$<%=parseFloat(totalGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((totalGain/portfolioObj.principal) * 100).toFixed(2)%>%)</td>
+                                    <%} else {%>
+                                        <td class="text-success">$<%=parseFloat(totalGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((totalGain/portfolioObj.principal) * 100).toFixed(2)%>%)</td>
+                                    <%}%>
                                   <%} else {%>
-                                      <td class="text-success">$<%=parseFloat(allDayGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((allDayGain/netValue) * 100).toFixed(2)%>%)</td>
+                                    <% if (allDayGain < 0) {%>
+                                      <td class="text-danger">$<%=parseFloat(allDayGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((allDayGain/netValue) * 100).toFixed(2)%>%)</td>
+                                    <%} else {%>
+                                        <td class="text-success">$<%=parseFloat(allDayGain).toLocaleString('en-US', {minimumFractionDigits:2})%>(<%=((allDayGain/netValue) * 100).toFixed(2)%>%)</td>
+                                    <%}%>
                                   <%}%>
                               </tr>   
                               <tr>

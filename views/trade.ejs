@@ -35,8 +35,12 @@
 
             $('#shares').on('change',function(){
                 if ($('#currentPrice').val() != "") {
-                    estimatedTotal = (parseFloat(currentPrice) * parseFloat($("#shares").val())).toFixed(2);
-                    $('#estimatedTotal').val("$" + estimatedTotal);
+                    if ($('#shares').val() != "") {
+                        estimatedTotal = (parseFloat(currentPrice) * parseFloat($("#shares").val())).toFixed(2);
+                        $('#estimatedTotal').val("$" + parseFloat(estimatedTotal).toLocaleString('en-US', {minimumFractionDigits:2}));
+                    } else {
+                        $('#estimatedTotal').val("")
+                    }
                 }
             })
 
@@ -49,7 +53,7 @@
                         $('#currentPrice').val("$" + currentPrice);
                         if ($('#shares').val() != "") {
                             estimatedTotal = (parseFloat(currentPrice) * parseFloat($("#shares").val())).toFixed(2);
-                            $('#estimatedTotal').val("$" + estimatedTotal);
+                            $('#estimatedTotal').val("$" + parseFloat(estimatedTotal).toLocaleString('en-US', {minimumFractionDigits:2}));
                         }
                     }
                 } else {

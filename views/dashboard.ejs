@@ -34,6 +34,7 @@
                         var innerData = [];
                         var prevClose = result[Object.keys(result)[i]]['quote']['previousClose'];
                         for (var j =0; j < result[Object.keys(result)[i]]['chart'].length; j+=30) {
+                            console.log(j);
                             var k = j;
                             if (typeof result[Object.keys(result)[i]]['chart'][k] == "undefined") {
                                 console.log(i, j);
@@ -133,18 +134,20 @@
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [{ 
+                    datasets: [
+                    //     { 
+                    //     data: data[0],
+                    //     label: "DOW",
+                    //     borderColor: "#3e95cd",
+                    //     fill: false
+                    // }, 
+                    { 
                         data: data[0],
-                        label: "DOW",
-                        borderColor: "#3e95cd",
-                        fill: false
-                    }, { 
-                        data: data[1],
                         label: "NASDAQ",
                         borderColor: "#8e5ea2",
                         fill: false
                     }, { 
-                        data: data[2],
+                        data: data[1],
                         label: "S&P 500",
                         borderColor: "#3cba9f",
                         fill: false

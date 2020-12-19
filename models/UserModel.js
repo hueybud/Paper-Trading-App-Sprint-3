@@ -30,7 +30,11 @@ function getUserByUsername(userName) {
 function getNewUserID() {
     return new Promise(function(resolve, reject){
         User.find({}).sort({userID: -1}).exec(function(err, docs){
-            resolve(docs[0].userID + 1);
+            if (docs.length == 0) {
+                resolve(1)
+            } else {
+                resolve(docs[0].userID + 1);
+            }
         })
     })
 }

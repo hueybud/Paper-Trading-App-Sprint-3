@@ -20,7 +20,7 @@ function buyStock(portfolioID, ticker, latestPrice, shares, totalCost) {
             }
             console.log("latest price of the stock: " + latestPrice);
             console.log(updatedStockObj);
-            portfolioModel.Portfolio.update({"portfolioID": portfolioID, "stocks.ticker": ticker}, {$set: {"stocks.$.purchasePrice": updatedPurchasePrice, "stocks.$.purchaseQuantity": updatedPurchaseQuantity, "stocks.$.purchaseValue": updatedPurchaseValue, "stocks.$.purchaseDate": updatedPurchaseDate}})
+            portfolioModel.Portfolio.update({"portfolioID": portfolioID, "stocks.ticker": ticker}, {$set: {"stocks.$.purchasePrice": updatedPurchasePrice, "stocks.$.purchaseQuantity": updatedPurchaseQuantity, "stocks.$.purchaseValue": updatedPurchaseValue}})
             .then(result => {
                 console.log(result);
                 var cash = parseFloat(portfolioObj.cash - totalCost);

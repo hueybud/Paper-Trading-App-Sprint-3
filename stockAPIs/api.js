@@ -8,7 +8,7 @@ var api_key = fs.readFileSync(path.resolve(__dirname, "./iexAPI.txt"), "utf-8");
 function getPortfolioQuotes(portfolioTickers) {
     return new Promise(async function(resolve, reject){
         if (portfolioTickers.length != 0) {
-            var apiResponse = await fetch('https://sandbox.iexapis.com/v1/stock/market/batch?&types=quote&symbols=' + portfolioTickers.toString() + '&token=' + api_key);
+            var apiResponse = await fetch('https://cloud.iexapis.com/v1/stock/market/batch?&types=quote&symbols=' + portfolioTickers.toString() + '&token=' + api_key);
             apiResponse.json().then(result => {
                 resolve(result);
             }).catch(err => {
@@ -22,7 +22,7 @@ function getPortfolioQuotes(portfolioTickers) {
 
 function getIndexes(dateRange) {
     return new Promise(async function(resolve ,reject){
-        var apiResponse = await fetch('https://sandbox.iexapis.com/stable/stock/market/batch?symbols=dia,qqq,spy&types=chart,quote&range=' + dateRange + '&token=' + api_key);
+        var apiResponse = await fetch('https://cloud.iexapis.com/stable/stock/market/batch?symbols=qqq,spy&types=chart,quote&range=' + dateRange + '&token=' + api_key);
         apiResponse = await apiResponse.json();
         resolve(apiResponse);
     })
@@ -30,7 +30,7 @@ function getIndexes(dateRange) {
 
 function getStockQuoteNoEarnings(ticker) {
     return new Promise(async function(resolve, reject){
-        var apiResponse = await fetch('https://sandbox.iexapis.com/stable/stock/' + ticker + '/quote?token=' + api_key);
+        var apiResponse = await fetch('https://cloud.iexapis.com/stable/stock/' + ticker + '/quote?token=' + api_key);
         apiResponse.json().then(async (result) => {
             console.log("stock quote has tried to be found");
             resolve(result);
@@ -43,7 +43,7 @@ function getStockQuoteNoEarnings(ticker) {
 
 function getStockQuote(ticker) {
     return new Promise(async function(resolve, reject){
-        var apiResponse = await fetch('https://sandbox.iexapis.com/stable/stock/' + ticker + '/quote?token=' + api_key);
+        var apiResponse = await fetch('https://cloud.iexapis.com/stable/stock/' + ticker + '/quote?token=' + api_key);
         apiResponse.json().then(async (result) => {
             console.log("stock quote has tried to be found, now let's try to get the earnings date");
             var earningsDate = await getEarningsDate(ticker);
@@ -83,7 +83,7 @@ function getYahooMultipleQuotes(tickers) {
 
 function getEarningsDate(ticker) {
     return new Promise(async function(resolve, reject){
-        var apiResponse = await fetch('https://sandbox.iexapis.com/stable/stock/' + ticker + '/upcoming-earnings?token=' + api_key);
+        var apiResponse = await fetch('https://cloud.iexapis.com/stable/stock/' + ticker + '/upcoming-earnings?token=' + api_key);
         apiResponse.json().then(result => {
             console.log("type of result:");
             console.log(result);
@@ -120,7 +120,7 @@ function getEarningsDate(ticker) {
 
 function getStockChart(ticker, dateRange) {
     return new Promise(async function(resolve ,reject){
-        var apiResponse = await fetch('https://sandbox.iexapis.com/stable/stock/market/batch?symbols=' + ticker + '&types=chart,quote&range=' + dateRange + '&token=' + api_key);
+        var apiResponse = await fetch('https://cloud.iexapis.com/stable/stock/market/batch?symbols=' + ticker + '&types=chart,quote&range=' + dateRange + '&token=' + api_key);
         apiResponse = await apiResponse.json();
         resolve(apiResponse);
     })
